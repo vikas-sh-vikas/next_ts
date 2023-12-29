@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 
 
-export default function verifyPage() {
+export default function VerifyPage() {
     const [token,setToken] = useState("")
     const [isVerified,setIsverified] = useState(false)
     const [error,setError] = useState(false)
@@ -17,9 +17,10 @@ export default function verifyPage() {
             setIsverified(true)
         } catch (error:any) {
             setError(true);
-            console.log(error.response.data)            
+            console.log(error.response.data)          
         }
     }
+
     useEffect(() => {
         const urlToken = window.location.search.split("=")[1];
             setToken(urlToken || '')
