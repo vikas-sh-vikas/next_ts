@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       varifyTokenExpiry: { $gt: Date.now() }
     });
     if (!user) {
-      return NextResponse.json({ error: "Invalid toke" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid token" }, { status: 400 });
     }
     console.log(user)
     user.isVarified = true;

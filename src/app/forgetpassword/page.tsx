@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 
 
 
+
 function Forgetpassword() {
   const router = useRouter();
   const [user, setUser] = useState({
