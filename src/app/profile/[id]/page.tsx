@@ -13,4 +13,5 @@ function UserProfile({params}:any) {
 }
 
 export default UserProfile
+
  

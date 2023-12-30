@@ -7,15 +7,23 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import Forgetpassword from "../forgetpassword/page";
 
+type LoginModel = {
+  email: string,
+  password: string,
+}
+
 function Login() {
   const router = useRouter();
-  const [user, setUser] = useState({
-    email: "",
-    password: "",
-  });
+
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [loading, setloading] = useState(false);
   const [reset, setReset] = useState(false);
+  const defaultValues: LoginModel = {
+    email: "",
+    password: "",
+  };
+  const [user, setUser] = useState<LoginModel>(defaultValues);
+
 
   const onLogin = async () => {
     if (reset) {
@@ -46,7 +54,7 @@ function Login() {
   };
 
   useEffect(() => {
-    if (user.email.length > 0 && user.password.length > 0) {
+    if (user?.email.length > 0 && user?.password.length > 0) {
       setButtonDisabled(false);
     } else {
       setButtonDisabled(true);

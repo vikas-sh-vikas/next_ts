@@ -6,9 +6,9 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Header from "@/components/header";
-import DashboardLayout from "@/components/layout";
+import DashboardLayout from "@/components/layout/layout";
 
-function Profile() {
+export default function Profile() {
   const router = useRouter();
 
   return (
@@ -26,5 +26,5 @@ function Profile() {
   );
 }
 
-export default Profile;
-// Profile.getLayout = DashboardLayout;
+// export default Profile;
+Profile.getLayout = DashboardLayout;

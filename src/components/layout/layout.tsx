@@ -4,16 +4,16 @@
  */
 import React, { useContext, useEffect, useState } from 'react';
 import Header from "@/components/header";
-import Decider from './desider';
+import Decider from '@/components/desider';
+import styles from '@/components/layout/layout.module.css';
 
 export default function DashboardLayout(page: React.ReactNode) {
-
+console.log("props")
 
   return (
-    <div>
+    <div className={styles.dashboardLayout}>
         <Header />
-      <Decider>{page}</Decider> 
-  
+        <Decider>{page}</Decider> 
     </div>
   );
 }
