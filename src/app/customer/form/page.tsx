@@ -1,6 +1,6 @@
 "use client";
 
-import Header from "@/components/header";
+import Header from "@/components/header/header";
 import axios from "axios";
 import { set } from "mongoose";
 import { useRouter } from "next/navigation";
@@ -67,7 +67,6 @@ function form() {
   console.log("customer", customer);
   return (
     <>
-      <Header />
       <div className="flex flex-col items-center py-2 bg-slate-50">
         <form className="w-full max-w-lg">
           <h1 className="block uppercase tracking-wide text-center text-gray-700 font-bold mb-8 text-3xl">
@@ -178,15 +177,13 @@ function form() {
         <div className="flex items-center justify-center">
           <button
             onClick={onSaveEdit}
-            className="bg-blue-500 p-2 border border-gray-300 rounded-lg 
-                    m-6 focus:outline-none focus:border-gray-600"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4"
           >
             {"Submit"}
           </button>
           <button
-            onClick={() => router.push("/application")}
-            className="bg-red-500 p-2 border border-gray-300 rounded-lg 
-                    m-6 focus:outline-none focus:border-gray-600"
+            onClick={() => router.push("/customer")}
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-4"
           >
             {"Cancel"}
           </button>

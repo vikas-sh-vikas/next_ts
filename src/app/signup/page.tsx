@@ -81,12 +81,11 @@ function SignUp() {
       />
       <button
         onClick={onSignup}
-        className="bg-blue-500 p-2 border border-gray-300 rounded-lg 
-        mb-4 focus:outline-none focus:border-gray-600"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4"
       >
-        {buttonDisabled ? "No sign Up" : "Sign Up"}
+        {"Sign Up"}
       </button>
-      <Link className="text-slate-300" href="/login">Visit login page</Link>
+      <Link className="text-slate-900" href="/login">Visit login page</Link>
     </div>
   );
 }

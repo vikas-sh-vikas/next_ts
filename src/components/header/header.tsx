@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -6,7 +8,6 @@ import { useRouter } from "next/navigation";
 function Header() {
   const router = useRouter();
   const [data, setData] = useState("");
-
   const logout = async () => {
     try {
       await axios.get("/api/users/logout");
@@ -24,8 +25,8 @@ function Header() {
     getuserdetails();
   }, []);
   return (
-    <div className="flex flex-row items-center justify-end">
-      <h2>{data}</h2>
+    <div className="bg-gray-50 flex flex-row items-center justify-end">
+      <h2 className="text-black">{data}</h2>
       <button
         onClick={logout}
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4"

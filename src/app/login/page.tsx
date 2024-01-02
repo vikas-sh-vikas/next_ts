@@ -118,18 +118,18 @@ function Login() {
           />
           <Link
             onClick={() => setReset(true)}
-            className="text-slate-300 justify-start text-xs mb-4"
+            className="text-slate-900 justify-start text-xs mb-4"
             href={""}
           >
             forget password or reset
-            password&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            password
           </Link>
         </>
       ) : (
         <Link
           href={""}
           onClick={() => setReset(false)}
-          className="text-slate-300 justify-start text-xs mb-4"
+          className="text-slate-900 justify-start text-xs mb-4"
         >
           Login with password
         </Link>
@@ -137,12 +137,17 @@ function Login() {
 
       <button
         onClick={onLogin}
-        className="bg-blue-500 p-2 border border-gray-300 rounded-lg 
-        mb-4 focus:outline-none focus:border-gray-600"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4"
       >
         {reset ? "Reset" : "Log In"}
       </button>
-      <Link className="text-slate-300" href="/signup">
+      {/* <button
+        onClick={logout}
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4"
+      >
+        Logout
+      </button> */}
+      <Link className="text-slate-900" href="/signup">
         Visit sign up page
       </Link>
     </div>

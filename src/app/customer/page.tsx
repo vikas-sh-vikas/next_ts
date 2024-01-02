@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Header from "@/components/header";
+import Header from "@/components/header/header";
 import { useRouter } from "next/navigation";
 type CustomerModel = {
   _id: string;
@@ -29,7 +29,7 @@ function index() {
   console.log("Data", data);
   const editFunction = async (id: string) => {
     console.log("Clicked edit", id);
-    router.push("/application/form?id=" + id);
+    router.push("/customer/form?id=" + id);
   };
   const deleteFunction = async (id: string, customerName: string) => {
     const data = {
@@ -37,15 +37,7 @@ function index() {
     };
     await setCustomerName(customerName)
     await setCustomerId(id)
-    console.log("Delete Reach")
     setModal(!modal)
-    // }
-    // try {
-    //   const response = await axios.post(`/api/customers/deleteCustomer`, data);
-    //   getCustomerdetails();
-    // } catch (error: any) {
-    //   console.log(error);
-    // }
   };
   const deleteConfirmFunction = async () => {
     const data = {
@@ -61,11 +53,10 @@ function index() {
     }
   };
   const onAddClick = async () => {
-    router.push("/application/form");
+    router.push("/customer/form");
   };
   return (
     <div>
-      <Header />
       <div className="p-4 flex flex-row justify-end items-center bg-slate-50">
         <input
           className="appearance-none block bg-gray-200 text-gray-700 border border-gray-200 rounded  p-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"

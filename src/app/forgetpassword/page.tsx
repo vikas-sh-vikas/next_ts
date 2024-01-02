@@ -77,12 +77,11 @@ function Forgetpassword() {
       
       <button
         onClick={onLogin}
-        className="bg-blue-500 p-2 border border-gray-300 rounded-lg 
-        mb-4 focus:outline-none focus:border-gray-600"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4"
       >
         Reset Password
       </button>
-      <Link className="text-slate-300" href="/signup">Visit sign up page</Link>  
+      <Link className="text-slate-900" href="/signup">Visit sign up page</Link>  
     </div>
   );
 }
