@@ -14,30 +14,28 @@ export async function POST(request: NextRequest) {
     //add customer
     if(reqBody._id){
       console.log("Reach Edit")
-      const customer = await Customer.findOne({
+      console.log(reqBody._id)
+      const customer = await Customer.findOneAndUpdate({
         _id: reqBody._id
-      });
-      customer.customerName = reqBody.customerName,
-      customer.gstNo = reqBody.gstNo,
-      customer.address = reqBody.address,
-      customer.contactPerson = reqBody.contactPerson,
-      customer.contactDetail = reqBody.contactDetail,
-      await customer.save();
+      },{
+        ...reqBody
+    });
+
+      console.log("Customer",customer)
+
       return NextResponse.json({
         message: "Customer Updated",
         success: true
       });
     }
     else {
-      const newCustomer = new Customer({
-        _id,customerName, gstNo, address, contactPerson, contactDetail
-      });
-      const saveCustomer = await newCustomer.save();
-  
+      
+      const customer = await Customer.create({  _id,customerName, gstNo, address, contactPerson, contactDetail})
+      console.log("Customer Reach Add",customer)
+      
       return NextResponse.json({
         message: "Customer saved",
         success: true,
-        saveCustomer,
       });
     }
   } catch (error: any) {

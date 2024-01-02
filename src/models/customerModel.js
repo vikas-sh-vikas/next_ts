@@ -4,12 +4,12 @@ const customerSchema = new mongoose.Schema({
     customerName:{
         type: String,
         required: [true,"Please provide a customerName"],
-        unique: true,
+        // unique: true,
     },
     gstNo:{
         type: String,
         required: [true,"Please provide a gstNo"],
-        unique: true,
+        // unique: true,
     },
     address:{
         type: String,
