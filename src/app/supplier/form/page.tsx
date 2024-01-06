@@ -7,9 +7,9 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-type CustomerModel = {
+type SupplierModel = {
   _id: string;
-  customerName: string;
+  supplierName: string;
   gstNo: string;
   address: string;
   contactPerson: string;
@@ -19,9 +19,9 @@ type CustomerModel = {
 function form() {
   const router = useRouter();
 
-  const defaultValues: CustomerModel = {
+  const defaultValues: SupplierModel = {
     _id: "",
-    customerName: "",
+    supplierName: "",
     gstNo: "",
     address: "",
     contactPerson: "",
@@ -29,11 +29,11 @@ function form() {
   };
   const urlparams = new URLSearchParams(location.search);
   const id = urlparams.get("id");
-  const [customer, setCustomer] = useState<CustomerModel>(defaultValues);
+  const [supplier, setSupplier] = useState<SupplierModel>(defaultValues);
   useEffect(() => {
-        getCustomerDetailByid()
+        getSupplierDetailByid()
   }, [id]);
-  const getCustomerDetailByid = async () => {
+  const getSupplierDetailByid = async () => {
     // if(id){
     const data = {
       id: id,
@@ -45,32 +45,31 @@ function form() {
       );
       const apiData = response.data.data;
       console.log(apiData)
-      setCustomer({ ...apiData})
+      setSupplier({ ...apiData})
     } catch (error: any) {
       console.log(error);
     }
   }
   const onSaveEdit = async () => {
     try {
-      console.log(customer);
+      console.log(supplier);
       const response = await axios.post(
-        "/api/customers/savecustomer",
-        customer
+        "/api/supplier/saveSupplier",
+        supplier
       );
       console.log("Save sucess", response.data);
       toast.success("Save success");
-      router.push("/customer");
+      router.push("/supplier");
     } catch (error: any) {
       toast.error(error.message);
     }
   };
-  console.log("customer", customer);
   return (
     <>
       <div className="flex flex-col items-center py-2 bg-slate-50">
         <form className="w-full max-w-lg">
           <h1 className="block uppercase tracking-wide text-center text-gray-700 font-bold mb-8 text-3xl">
-            Cunstomer Detail
+            Supplier Detail
           </h1>
 
           <hr className="mb-2"></hr>
@@ -86,10 +85,10 @@ function form() {
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
                 id="grid-first-name"
                 type="text"
-                value={customer.customerName}
+                value={supplier.supplierName}
                 placeholder="Enter Customer Name"
                 onChange={(e) =>
-                  setCustomer({ ...customer, customerName: e.target.value })
+                  setSupplier({ ...supplier, supplierName: e.target.value })
                 }
               />
             </div>
@@ -103,12 +102,12 @@ function form() {
               <input
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 id="grid-last-name"
-                value={customer.gstNo}
+                value={supplier.gstNo}
 
                 type="text"
                 placeholder="Enter GST No."
                 onChange={(e) =>
-                  setCustomer({ ...customer, gstNo: e.target.value })
+                  setSupplier({ ...supplier, gstNo: e.target.value })
                 }
               />
             </div>
@@ -125,11 +124,11 @@ function form() {
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 id="grid-password"
                 type="text"
-                value={customer.address}
+                value={supplier.address}
 
                 placeholder="Enter Address"
                 onChange={(e) =>
-                  setCustomer({ ...customer, address: e.target.value })
+                  setSupplier({ ...supplier, address: e.target.value })
                 }
               />
             </div>
@@ -146,11 +145,11 @@ function form() {
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 id="grid-city"
                 type="text"
-                value={customer.contactPerson}
+                value={supplier.contactPerson}
 
                 placeholder="Enter Name"
                 onChange={(e) =>
-                  setCustomer({ ...customer, contactPerson: e.target.value })
+                  setSupplier({ ...supplier, contactPerson: e.target.value })
                 }
               />
             </div>
@@ -165,10 +164,10 @@ function form() {
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 id="grid-zip"
                 type="text"
-                value={customer.contactDetail}
+                value={supplier.contactDetail}
                 placeholder="Enter Detail"
                 onChange={(e) =>
-                  setCustomer({ ...customer, contactDetail: e.target.value })
+                  setSupplier({ ...supplier, contactDetail: e.target.value })
                 }
               />
             </div>
@@ -182,7 +181,7 @@ function form() {
             {"Submit"}
           </button>
           <button
-            onClick={() => router.push("/customer")}
+            onClick={() => router.push("/supplier")}
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-4"
           >
             {"Cancel"}

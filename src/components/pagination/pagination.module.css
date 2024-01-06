@@ -1,0 +1,73 @@
+
+.pageitem {
+  display: inline-block;
+}
+.pagelink {
+  display: block;
+  cursor: pointer;
+  color: var(--bs-primary); /* Link color */
+  padding: 6px 12px;
+  border-radius: 4px;
+  text-align: center;
+  text-decoration: none;
+  background-color: #fff; /* Background color */
+}
+/* Active page */
+.pageitem.active .pagelink {
+  color: black; /* Active page text color */
+  background-color: var(--bs-primary);; /* Active page background color */
+}
+/* Disabled page link */
+.pageitem.disabled .pagelink {
+  color: #ccc; /* Disabled link color */
+  cursor: not-allowed;
+  pointer-events: none;
+}
+/* Ellipsis */
+.pageitem.break .pagelink {
+  cursor: default;
+  pointer-events: none;
+}
+
+.pagination {
+  display: flex;
+  justify-content: right;
+  padding-right: 1rem;
+}
+.pagination button {
+  margin: 0 5px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+}
+
+.paginationContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5vh !important;
+}
+
+.pagination button.active {
+  color: #fff;
+  background-color: var(--bs-primary);
+}
+.pageInfo {
+  display: flex;
+  justify-content: left;
+  padding-left: 1rem;
+  font-size: 0.9em;
+  color: var(--bs-dark);
+  align-items: center;
+  
+}
+
+.pageSize{
+  margin-left: 20px;
+ 
+}
+.pageSizeBox{
+  margin-left: 10px;
+}
+

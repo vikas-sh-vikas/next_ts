@@ -1,0 +1,80 @@
+/**
+ * organisation.module.css
+ * All the css for List Component and Form Component of Organisation-Form will be wrote here only.
+ */
+ .dropdown{
+background-color: red;
+  }
+  .textCenter {
+    text-align: center;
+  }
+  
+  .alignCenter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .headerstyle {
+    color: rgb(21, 192, 135);
+  }
+  
+  .borderNone {
+    border: none;
+  }
+  
+  .borderRadius {
+    border-radius: 1rem;
+  }
+  .text {
+    font-size: 15px !important;
+    color: rgb(8, 194, 194) !important;
+  }
+  
+  .deleteIcon {
+    color: rgb(179, 28, 28);
+    cursor: pointer;
+  }
+  
+  .deleteIcon:hover {
+    transform: scale(1.2);
+  }
+  
+  .editIcon:hover {
+    cursor: pointer;
+    transform: scale(1.2);
+  }
+  
+  .searchContainer {
+    display: flex;
+    align-items: center;
+    margin: 10px;
+  }
+  
+  .searchBox {
+    padding: 10px;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    width: 92%;
+    text-align: center;
+  }
+  
+  .arrowPointer::before {
+    content: "";
+    position: absolute;
+    top: -0.5rem;
+    right: 1rem;
+    border-width: 0 8px 8px 8px;
+    border-style: solid;
+    border-color: transparent transparent rgb(255, 255, 255) transparent;
+  }
+
+  .labelsName ::after {
+    content: '*';
+    color: red;
+  }
+  .FontAwesomeIconStyle{
+    margin-right: 5px;
+  }

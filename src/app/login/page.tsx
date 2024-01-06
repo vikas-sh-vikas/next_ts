@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Forgetpassword from "../forgetpassword/page";
+import { logOut,logIn } from "@/redux/features/auth-slice";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/redux/store";
 
 type LoginModel = {
   email: string,
@@ -14,6 +17,7 @@ type LoginModel = {
 
 function Login() {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
 
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [loading, setloading] = useState(false);
@@ -33,6 +37,7 @@ function Login() {
         toast.success("User Match");
         const id = response.data.data._id;
         router.push("/forgetpassword?id=" + id);
+        console.log("response.data.data",response.data.data)
       } catch (error: any) {
         toast.error(error.message);
       } finally {
@@ -45,6 +50,11 @@ function Login() {
         console.log("login sucess", response.data);
         toast.success("login success");
         router.push("/profile");
+        // console.log("login sucess", response.data.data.username);
+        const username = response.data.data.username;
+        console.log("Username", username);
+        dispatch(logIn(username));
+
       } catch (error: any) {
         toast.error(error.message);
       } finally {
