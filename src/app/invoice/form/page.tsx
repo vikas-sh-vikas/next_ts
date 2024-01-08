@@ -9,25 +9,38 @@ import toast from "react-hot-toast";
 import { FaCheck, FaPlus, FaTimes, FaTrash } from "react-icons/fa";
 import { Table,Input } from "reactstrap";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup"
+import * as yup from "yup"
+import Select from "react-select";
+
+
 
 type CustomerModel = {
   invoiceNo: string;
-  Date: string;
-  labourCharge: string;
-  freight: number;
-  igst: number;
-  sgst: number;
-  cgst: number;
-  totalAmount: number;
-  totalAmountGst: number;
+  Date?: string;
+  shipTo?:{
+    label?: string;
+    value?: string;
+  },
+  billTo?:{
+    label?: string;
+    value?: string;
+  },
+  labourCharge?: string;
+  freight?: number;
+  igst?: number;
+  sgst?: number;
+  cgst?: number;
+  totalAmount?: number;
+  totalAmountGst?: number;
   itemList?: {
-    _id: string;
-    description: string;
-    qty: number;
-    unit: string;
-    unitPrice: number;
-    discount: number;
-    subTotal: number;
+    _id?: string;
+    description?: string;
+    qty?: number;
+    unit?: string;
+    unitPrice?: number;
+    discount?: number;
+    subTotal?: number;
   }[];
 };
 
@@ -35,9 +48,19 @@ function form() {
   const router = useRouter();
   // const { register, setValue } = useForm();
   const [invoice, setInvoice] = useState("")
+  const [selectOptionShip, setSelectOptionShip] = useState([{}])
+
   const defaultValues: CustomerModel = {
     invoiceNo: "",
     Date: "",
+    shipTo: {
+      label: "Select",
+      value: "",
+    },
+    billTo: {
+      label: "Select",
+      value: "",
+    },
     labourCharge: "",
     freight: 0,
     igst: 0,
@@ -61,8 +84,26 @@ function form() {
   const id = urlparams.get("id");
   const [customer, setCustomer] = useState<CustomerModel>(defaultValues);
   useEffect(() => {
-    getCustomerDetailByid();
-  }, [id]);
+    getCustomerdetails()
+    if(id){
+      getCustomerDetailByid();
+    }
+  }, []);
+  const getCustomerdetails = async () => {
+    console.log("Reach API")
+    try {
+      const res = await axios.get("/api/customers/getcustomer");
+      const api:any[] = res.data.data
+      const newArray: {}[] = api.map((item: any) => ({
+        value: item._id,
+        label: item.customerName
+    }));
+    console.log("Option Array",newArray)
+    setSelectOptionShip(newArray)
+    } catch (error) {
+      console.log("Error", error)
+    }
+  };
   const getCustomerDetailByid = async () => {
     // if(id){
     const data = {
@@ -78,6 +119,40 @@ function form() {
       console.log(error);
     }
   };
+  const schema = yup
+  .object({
+    invoiceNo: yup.string().required("Required"),
+    Date: yup.string(),
+    shipTo: 
+    yup.object({
+      label: yup.string(),
+      value: yup.string(),
+    }),
+    billTo: 
+    yup.object({
+      label: yup.string(),
+      value: yup.string(),
+    }),
+    labourCharge: yup.string(),
+    freight: yup.number(),
+    igst: yup.number(),
+    sgst: yup.number(),
+    cgst: yup.number(),
+    totalAmount: yup.number(),
+    totalAmountGst: yup.number(),
+    itemList: yup.array().of(
+      yup.object({
+        _id: yup.string(),
+        description: yup.string(),
+        qty: yup.number(),
+        unit: yup.string(),
+        unitPrice: yup.number(),
+        discount: yup.number(),
+        subTotal: yup.number(),
+      })
+    ),
+  })
+  .required();
   const [formData, setFormData] = useState<CustomerModel>(defaultValues);
   const {
     register,
@@ -91,19 +166,31 @@ function form() {
   } = useForm<CustomerModel>({
     mode: "all",
     defaultValues: formData,
-    // resolver: yupResolver<CustomerModel>(validationSchema),
+    resolver: yupResolver<CustomerModel>(schema),
   });
   const { fields, append, remove } = useFieldArray({
     control,
     name: "itemList",
   });
   const formValues = getValues();
+  const onSubmit: SubmitHandler<CustomerModel> = (data) => 
+  {console.log("submit_data==========>", data)
+  }
+  // const country: CountryOption[] = [
+  //   { label: "Bangladesh", value: 1 },
+  //   { label: "India", value: 2 },
+  //   { label: "China", value: 3 },
+  //   { label: "Finland", value: 4 }
+  // ];
+  const country1 =
+    { label: "Bangladesh", value: 1 }
 
   const onSaveEdit = async () => {
     try {
       const payload = {
         data: {
           invoicename: invoice,
+
           array: {
             ...formValues,
           },
@@ -122,20 +209,17 @@ function form() {
       toast.error(error.message);
     }
   };
-  // console.log("customer", customer);
-  console.log("field Array", fields);
-  console.log("field FormValues", formValues);
-
+  console.log("FormData------>",formValues)
   return (
     <>
       <div className="flex flex-col items-center py-2 bg-slate-50">
-        <form className="w-full p-4">
+        <form className="w-full p-4" onSubmit={handleSubmit(onSubmit)}>
           <h1 className="block uppercase tracking-wide text-center text-gray-700 font-bold mb-8 text-3xl">
             Create Invoice
           </h1>
 
           <hr className="mb-2"></hr>
-          <div className="flex flex-wrap -mx-3 mb-6" onSubmit={handleSubmit(onSaveEdit)}>
+          <div className="flex flex-wrap -mx-3 mb-6" >
             <div className="w-full md:w-1/12 px-3 mb-6 md:mb-0">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -144,18 +228,14 @@ function form() {
                 Invoice No.
               </label>
               <input
+                //error={errors.invoiceNo?.message}
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
                 id="grid-first-name"
                 type="text"
-                name="invoiceNo"
-                value={formValues?.invoiceNo}
-                placeholder="Enter Customer Name"
-                onChange={(selected) =>
-                  setValue("invoiceNo", selected.target.value, {
-                    shouldValidate: true,
-                  })
-                }
+                placeholder="Enter Invoice Number"
+                {...register('invoiceNo')}
               />
+              <p>{errors.invoiceNo?.message}</p>
             </div>
             <div className="w-full md:w-10/12 px-3"></div>
             <div className="w-full md:w-1/12 px-3">
@@ -169,10 +249,8 @@ function form() {
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
                 id="grid-first-name"
                 type="text"
-                name="Date"
-                //value={formData.Date}
-                placeholder="Enter Customer Name"
-                onChange={(selected) => setValue("Date", selected.target.value)}
+                {...register('Date')}
+                placeholder="Enter Date"
               />
             </div>
           </div>
@@ -184,13 +262,25 @@ function form() {
               >
                 Ship To
               </label>
-              <select className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
-                <option>
-                  Really long option that will likely overlap the chevron
-                </option>
-                <option>Option 2</option>
-                <option>Option 3</option>
-              </select>
+              <Select
+                isSearchable={true}
+                name="supervisorId"
+                value={formValues?.shipTo}
+                options={selectOptionShip}
+                onChange={(selected: any) => {
+                setValue("shipTo.label", selected.label, {
+                    // shouldValidate: true,
+                });
+                setValue("shipTo.value", selected.value, {
+                    // shouldValidate: true,
+                });
+              }}
+                // value={country.find((c) => c.value === field.value)}
+                // onChange={(val) => field.onChange(val.value)}
+                // defaultValue={country.find((c) => c.value === countryValue?.value)}
+              />
+              <p>{errors.invoiceNo?.message}</p>  
+              {/* </Select> */}
             </div>
             <div className="w-full w-full md:w-1/2 px-3">
               <label
@@ -199,13 +289,24 @@ function form() {
               >
                 Bill To
               </label>
-              <select className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
-                <option>
-                  Really long option that will likely overlap the chevron
-                </option>
-                <option>Option 2</option>
-                <option>Option 3</option>
-              </select>
+              <Select
+                isSearchable={true}
+
+                name="supervisorId"
+                value={formValues?.billTo}
+                options={selectOptionShip}
+                onChange={(selected: any) => {
+                setValue("billTo.label", selected.label, {
+                    // shouldValidate: true,
+                });
+                setValue("billTo.value", selected.value, {
+                    // shouldValidate: true,
+                });
+              }}
+                // value={country.find((c) => c.value === field.value)}
+                // onChange={(val) => field.onChange(val.value)}
+                // defaultValue={country.find((c) => c.value === countryValue?.value)}
+              />
             </div>
           </div>
           <Table className="table-sm table table-bordered" responsive>
@@ -245,15 +346,19 @@ function form() {
                     <input
                       className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
                       type="text"
-                      name={`itemList.${index}.description`}
-                      //value={formValues.itemList?.[index]?.description}
+                    {...register(`itemList.${index}.description`)}
+
                       placeholder="Enter Description"
-                      onChange={(e) => {
-                        setValue(
-                          `itemList.${index}.description`,
-                          e.target.value
-                        );
-                      }}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                      id="grid-first-name"
+                      type="text"
+                      placeholder="Enter Qty"
+                      {...register(`itemList.${index}.unit`)}
+
                     />
                   </td>
                   <td>
@@ -262,42 +367,26 @@ function form() {
                       id="grid-first-name"
                       type="text"
                       placeholder="Enter Quantity"
-                      name={`itemList.${index}.qty`}
-                      //value={formValues.itemList?.[index]?.qty}
-                      onChange={(e) => {
-                        setValue(
-                          `itemList.${index}.qty`,
-                          parseInt(e.target.value)
-                        );
-                      }}
+                    {...register(`itemList.${index}.qty`)}
+                    onChange={(e)=>{
+                      setValue(`itemList.${index}.qty`,parseInt(e.target.value),{
+                        shouldValidate: true,
+                      })
+                    }}
                     />
                   </td>
-                  <td>
-                    <input
-                      className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                      id="grid-first-name"
-                      type="text"
-                      placeholder="Enter Unit"
-                      name={`itemList.${index}.unit`}
-                      //value={formValues.itemList?.[index]?.unit}
-                      onChange={(e) => {
-                        setValue(`itemList.${index}.unit`, e.target.value);
-                      }}
-                    />
-                  </td>
+
                   <td>
                     <input
                       className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
                       id="grid-first-name"
                       type="text"
                       placeholder="Enter Unit Price"
-                      name={`itemList.${index}.unitPrice`}
-                      //value={formValues.itemList?.[index]?.unitPrice}
-                      onChange={(e) => {
-                        setValue(
-                          `itemList.${index}.unitPrice`,
-                          parseInt(e.target.value)
-                        );
+                      {...register(`itemList.${index}.unitPrice`)}
+                      onChange={(e)=>{
+                        setValue(`itemList.${index}.unitPrice`,parseInt(e.target.value),{
+                          shouldValidate: true,
+                        })
                       }}
                     />
                   </td>
@@ -308,13 +397,11 @@ function form() {
                       id="grid-first-name"
                       type="text"
                       placeholder="Discount"
-                      name={`itemList.${index}.discount`}
-                      //value={formValues.itemList?.[index]?.discount}
-                      onChange={(e) => {
-                        setValue(
-                          `itemList.${index}.discount`,
-                          parseInt(e.target.value)
-                        );
+                      {...register(`itemList.${index}.discount`)}
+                      onChange={(e)=>{
+                        setValue(`itemList.${index}.discount`,parseInt(e.target.value),{
+                          shouldValidate: true,
+                        })
                       }}
                     />
                   </td>
@@ -325,14 +412,8 @@ function form() {
                       type="text"
                       disabled={true}
                       placeholder="Total"
-                      name={`itemList.${index}.subTotal`}
-                      //value={formValues.itemList?.[index]?.subTotal}
-                      onChange={(e) => {
-                        setValue(
-                          `itemList.${index}.subTotal`,
-                          parseInt(e.target.value)
-                        );
-                      }}
+                      value={(formValues.itemList?.[index]?.qty as any)*(formValues.itemList?.[index]?.unitPrice as any)}
+                      {...register(`itemList.${index}.subTotal`)}
                     />
                   </td>
                   <td>
@@ -354,12 +435,8 @@ function form() {
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 id="grid-city"
                 type="text"
-                name="labourCharge"
-                //value={formData.labourCharge}
-                placeholder="Enter Name"
-                onChange={(selected) =>
-                  setValue("labourCharge", selected.target.value)
-                }
+                {...register('labourCharge')}
+                placeholder="Enter Labour Charge"
               />
             </div>
             <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0">
@@ -372,13 +449,9 @@ function form() {
               <input
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 id="grid-zip"
-                type="text"
-                name="freight"
-                //value={formData.freight}
-                placeholder="Enter Detail"
-                onChange={(selected) =>
-                  setValue("freight", parseInt(selected.target.value))
-                }
+                type="number"
+                {...register('freight')}
+                placeholder="Enter Freightl"
               />
             </div>
             <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0">
@@ -391,13 +464,9 @@ function form() {
               <input
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 id="grid-zip"
-                type="text"
-                name="igst"
-                //value={formData.igst}
-                placeholder="Enter Detail"
-                onChange={(selected) =>
-                  setValue("igst", parseInt(selected.target.value))
-                }
+                type="number"
+                {...register('igst')}
+                placeholder="Enter IGST"
               />
             </div>
             <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0">
@@ -410,13 +479,9 @@ function form() {
               <input
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 id="grid-zip"
-                type="text"
-                //value={formData.sgst}
-                name="sgst"
-                placeholder="Enter Detail"
-                onChange={(selected) =>
-                  setValue("sgst", parseInt(selected.target.value))
-                }
+                type="number"
+                {...register('sgst')}
+                placeholder="Enter SGST"
               />
             </div>
             <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0">
@@ -429,13 +494,9 @@ function form() {
               <input
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 id="grid-zip"
-                type="text"
-                name="cgst"
-                //value={formData.cgst}
-                placeholder="Enter Detail"
-                onChange={(selected) =>
-                  setValue("cgst", parseInt(selected.target.value))
-                }
+                type="number"
+                {...register('cgst')}
+                placeholder="Enter CGST"
               />
             </div>
           </div>
@@ -450,14 +511,10 @@ function form() {
               <input
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 id="grid-zip"
-                type="text"
-                name="totalAmount"
+                type="number"
                 disabled={true}
-                //value={formData.totalAmount}
-                placeholder="Enter Detail"
-                onChange={(selected) =>
-                  setValue("totalAmount", parseInt(selected.target.value))
-                }
+                {...register('totalAmount')}
+                placeholder="Amount"
               />
             </div>
           </div>
@@ -472,21 +529,17 @@ function form() {
               <input
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 id="grid-zip"
-                type="text"
-                name="totalAmountGst"
+                type="number"
                 disabled={true}
-                placeholder="Enter Detail"
-                onChange={(selected) =>
-                  setValue("totalAmountGst", parseInt(selected.target.value))
-                }
+                {...register('totalAmountGst')}
+                placeholder="Total Amount"
               />
             </div>
           </div>
-        </form>
         <div className="flex items-center justify-center">
           <button
-            onClick={onSaveEdit}
-            //type="submit"
+            // onClick={onSaveEdit}
+            type="submit"
             // buttonClassNames="saveButton"
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4"
           >
@@ -499,7 +552,9 @@ function form() {
             {"Cancel"}
           </button>
         </div>
+        </form>
       </div>
+      
     </>
   );
 }

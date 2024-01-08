@@ -25,11 +25,15 @@ function index() {
     getCustomerdetails();
   }, []);
   const getCustomerdetails = async () => {
-    const res = await axios.get("/api/customers/getcustomer");
-    const TotalNoofPages = (res.data.data).length;
-    setData(res.data.data);
-    console.log("TotalNumberofPages", TotalNoofPages)
-    setTotalRows(TotalNoofPages)
+    try {
+      const res = await axios.get("/api/customers/getcustomer");
+      const TotalNoofPages = (res.data.data).length;
+      setData(res.data.data);
+      console.log("TotalNumberofPages", TotalNoofPages)
+      setTotalRows(TotalNoofPages)
+    } catch (error) {
+      console.log("Error", error)
+    }
   };
   // console.log("Data", data);
   const editFunction = async (id: string) => {
