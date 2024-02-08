@@ -17,7 +17,7 @@ type LoginModel = {
 
 function Login() {
   const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
 
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [loading, setloading] = useState(false);

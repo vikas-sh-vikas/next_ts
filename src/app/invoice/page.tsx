@@ -58,7 +58,7 @@ function index() {
     }
   };
   const onAddClick = async () => {
-    router.push("/customer/form");
+    router.push("/invoice/form");
   };
   return (
     <div>

@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <title>Document</title>
+
+  <style>
+    th,td{
+      border-width: 1px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <h1 class="block uppercase tracking-wide text-center text-gray-700 font-bold mb-8 text-3xl">
+    Invoice
+  </h1>
+  <hr>
+</hr>
+  <div class="flex flex-col items-center py-2 bg-slate-50 bg-white">
+    <form class="w-full p-4 bg">
+      <div class="flex flex-wrap -mx-3 mb-6">
+        <div class="w-full md:w-1/12 px-3 mb-6 md:mb-0">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+            htmlFor="grid-first-name">
+            Invoice No. -
+          </label>
+          <label>123</label>
+        </div>
+        <div class="w-full md:w-10/12 px-3"></div>
+        <div class="w-full md:w-1/12 px-3 border-black border-solid">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+            htmlFor="grid-last-name">
+            Date
+          </label>
+          <label>12-1-2024</label>
+        </div>
+      </div>
+      <hr class="mb-2">
+    </hr>
+      <div class="flex flex-wrap -mx-3 mb-6">
+        <div class="w-full w-full md:w-1/2 px-3">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-password">
+            Ship To : -
+          </label>
+          <label>Parvati Marble Granite
+            Siayana, Rajsamand
+          </label>
+        </div>
+        <div class="w-full w-full md:w-1/2 px-3">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-password">
+            Bill To
+          </label>
+          <label>Parvati Marble Granite
+            Siayana, Rajsamand
+          </label>
+
+        </div>
+      </div>
+      <hr class="mb-2">
+    </hr>
+
+      <Table class="border-collapse border border-slate-400 w-full" responsive>
+        <thead>
+          <tr>
+            <th>Sr. No.</th>
+            <th>Description</th>
+            <th>Unit</th>
+            <th>Qty.</th>
+            <th>Unit Price</th>
+            <th>Discount %</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- {fields.map((item, index) => ( -->
+          <tr key={index}>
+            <td class="text-center">1</td>
+
+            <td class="text-center">
+              Cutter
+            </td>
+            <td class="text-center">
+              Nos
+            </td>
+            <td class="text-center"> 
+              2
+            </td>
+
+            <td class="text-center"> 
+              25000
+              <form action="" method="get"></form>
+            </td>
+
+            <td class="text-center">
+              5%
+            </td>
+            <td class="text-center">
+              45000
+            </td>
+          </tr>
+        </tbody>
+      </Table>
+      <hr class="m-2">
+    </hr>
+      <div class="flex flex-wrap -mx-3 mb-2">
+        <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-city">
+            Laboar Charges :-
+          </label>
+          240
+        </div>
+        <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-zip">
+            Freight : -
+          </label>
+          300
+        </div>
+      </div>
+      <hr class="mb-2">
+    </hr>
+      <div class="flex flex-wrap -mx-3 mb-2">
+        <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-zip">
+            GST
+          </label>
+          IGST
+          <!-- <Select isSearchable={true} name="supervisorId" value={formValues?.gstType}> -->
+        </div>
+        <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-zip">
+            IGST
+          </label>
+          18 %
+          <!-- <Select isSearchable={true} name="supervisorId" value={formValues?.igst} options={gstOptions}> -->
+        </div>
+        <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-zip">
+            CGST
+          </label>
+          9 %
+          <!-- <Select isSearchable={true} name="supervisorId" value={formValues?.cgst} options={sgstOptions}> -->
+        </div>
+        <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-zip">
+            SGST
+          </label>
+          9 %
+          <!-- <Select isSearchable={true} name="supervisorId" value={formValues?.sgst} options={sgstOptions}> -->
+        </div>
+      </div>
+      <hr class="mb-2">
+    </hr>
+      <div class="flex flex-wrap -mx-3 mb-2">
+        <div class="w-full w-full md:w-1/2 px-3">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-password">
+            Total Amount : -
+          </label>
+          25000
+        </div>
+      </div>
+      <div class="flex flex-wrap -mx-3 mb-2">
+        <div class="w-full w-full md:w-1/2 px-3">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-password">
+            Total Amount With GST : -
+          </label>
+          25000
+        </div>
+        <div class="flex items-center justify-center">
+        </div>
+    </form>
+  </div>
+</body>
+
+</html>
