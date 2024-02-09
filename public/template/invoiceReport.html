@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 
-  <title>Document</title>
+  <title>Invoice</title>
 
   <style>
     th,td{
@@ -29,7 +29,7 @@
             htmlFor="grid-first-name">
             Invoice No. -
           </label>
-          <label>123</label>
+          <label>@invoiceNo@</label>
         </div>
         <div class="w-full md:w-10/12 px-3"></div>
         <div class="w-full md:w-1/12 px-3 border-black border-solid">
@@ -37,7 +37,7 @@
             htmlFor="grid-last-name">
             Date
           </label>
-          <label>12-1-2024</label>
+          <label>@date@</label>
         </div>
       </div>
       <hr class="mb-2">
@@ -47,16 +47,14 @@
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-password">
             Ship To : -
           </label>
-          <label>Parvati Marble Granite
-            Siayana, Rajsamand
+          <label>@shipTo@
           </label>
         </div>
         <div class="w-full w-full md:w-1/2 px-3">
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-password">
             Bill To
           </label>
-          <label>Parvati Marble Granite
-            Siayana, Rajsamand
+          <label>@billTo@
           </label>
 
         </div>
@@ -78,7 +76,8 @@
         </thead>
         <tbody>
           <!-- {fields.map((item, index) => ( -->
-          <tr key={index}>
+            @Name@
+          <!-- <tr key={index}>
             <td class="text-center">1</td>
 
             <td class="text-center">
@@ -102,7 +101,7 @@
             <td class="text-center">
               45000
             </td>
-          </tr>
+          </tr> -->
         </tbody>
       </Table>
       <hr class="m-2">
@@ -112,13 +111,13 @@
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-city">
             Laboar Charges :-
           </label>
-          240
+          @labourCharge@
         </div>
         <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-zip">
             Freight : -
           </label>
-          300
+          @freight@
         </div>
       </div>
       <hr class="mb-2">
@@ -126,30 +125,30 @@
       <div class="flex flex-wrap -mx-3 mb-2">
         <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-zip">
-            GST
+            GST Type
           </label>
-          IGST
+          @gstType@
           <!-- <Select isSearchable={true} name="supervisorId" value={formValues?.gstType}> -->
         </div>
         <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-zip">
             IGST
           </label>
-          18 %
+          @igstper@
           <!-- <Select isSearchable={true} name="supervisorId" value={formValues?.igst} options={gstOptions}> -->
         </div>
         <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-zip">
             CGST
           </label>
-          9 %
+          @cgstper@
           <!-- <Select isSearchable={true} name="supervisorId" value={formValues?.cgst} options={sgstOptions}> -->
         </div>
         <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-zip">
             SGST
           </label>
-          9 %
+          @sgstper@
           <!-- <Select isSearchable={true} name="supervisorId" value={formValues?.sgst} options={sgstOptions}> -->
         </div>
       </div>
@@ -160,7 +159,7 @@
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-password">
             Total Amount : -
           </label>
-          25000
+          @total@
         </div>
       </div>
       <div class="flex flex-wrap -mx-3 mb-2">
@@ -168,7 +167,7 @@
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-password">
             Total Amount With GST : -
           </label>
-          25000
+          @totalGst@
         </div>
         <div class="flex items-center justify-center">
         </div>

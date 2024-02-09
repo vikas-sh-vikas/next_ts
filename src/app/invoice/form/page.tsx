@@ -12,6 +12,7 @@ import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Select from "react-select";
+import "bootstrap/dist/css/bootstrap.css";
 
 type CustomerModel = {
   invoiceNo: string;
@@ -57,7 +58,6 @@ type CustomerModel = {
 
 function form() {
   const router = useRouter();
-  // const { register, setValue } = useForm();
   const [invoice, setInvoice] = useState("");
   const [selectOptionShip, setSelectOptionShip] = useState([{}]);
 
@@ -82,6 +82,7 @@ function form() {
   };
   const urlparams = new URLSearchParams(location.search);
   const id = urlparams.get("id");
+  const html2pdf = require("html2pdf.js");
   const [customer, setCustomer] = useState<CustomerModel>(defaultValues);
   useEffect(() => {
     getCustomerdetails();
@@ -125,8 +126,76 @@ function form() {
       value: "14",
     },
   ];
+  const downloadPDF = async () => {
+    let html: any = await fetch(`/template/invoiceReport.html`);
+    html = await html.text();
+    const item = formValues?.itemList;
+    html = html
+      .toString()
+      .replace(
+        "@Name@",
+        (formValues?.itemList || []).map(
+          (item, index) =>
+            `<tr key={index}>
+          <td>${index + 1}</td>
+          <td>
+            ${item.description}
+          </td>
+          <td>
+            ${item.unit}
+          </td>
+          <td>
+            ${item.qty}
+          </td>
+          <td>
+            ${item.unitPrice}
+          </td>
+          <td>
+            ${item.discount}
+          </td>
+          <td>
+            ${item.subTotal}
+          </td>
+        </tr>`
+        )
+      )
+      .replace("@invoiceNo@", formValues?.invoiceNo)
+      .replace("@date@", formValues?.Date)
+      .replace("@shipTo@", formValues?.shipTo?.label)
+      .replace("@billTo@", formValues?.billTo?.label)
+      .replace("@labourCharge@", formValues?.labourCharge)
+      .replace("@freight@", formValues?.freight)
+      .replace("@gstType@", formValues?.gstType?.label)
+      .replace("@igstper@", formValues?.igst?.label)
+      .replace("@cgstper@", formValues?.cgst?.label)
+      .replace("@sgstper@", formValues?.sgst?.label)
+      .replace("@total@", formValues?.totalAmount)
+      .replace("@totalGst@", formValues?.totalAmountGst);
+
+    console.log(html);
+    const opt = {
+      margin: [20, 20, 20, 20],
+      zoom: "100%",
+      filename: "test.pdf",
+      image: { type: "jpeg", quality: 1 },
+      html2canvas: {
+        dpi: 192,
+        scale: 4,
+        letterRendering: true,
+        useCORS: true,
+        scrollY: 0,
+      },
+      jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
+    };
+    console.log("html", html);
+    html2pdf()
+      .set(opt)
+      .from(html)
+      .toPdf()
+      .get("pdf")
+      .output("dataurlnewwindow");
+  };
   const getCustomerdetails = async () => {
-    // console.log("Reach API");
     try {
       const res = await axios.get("/api/customers/getcustomer");
       const api: any[] = res.data.data;
@@ -134,14 +203,12 @@ function form() {
         value: item._id,
         label: item.customerName,
       }));
-      // console.log("Option Array", newArray);
       setSelectOptionShip(newArray);
     } catch (error) {
       console.log("Error", error);
     }
   };
   const getCustomerDetailByid = async () => {
-    // if(id){
     const data = {
       id: id,
     };
@@ -149,7 +216,6 @@ function form() {
     try {
       const response = await axios.post(`/api/customers/getCustomerById`, data);
       const apiData = response.data.data;
-      // console.log(apiData);
       setCustomer({ ...apiData });
     } catch (error: any) {
       console.log(error);
@@ -219,14 +285,7 @@ function form() {
   const onSubmit: SubmitHandler<CustomerModel> = (data) => {
     console.log("submit_data==========>", data);
   };
-  // const country: CountryOption[] = [
-  //   { label: "Bangladesh", value: 1 },
-  //   { label: "India", value: 2 },
-  //   { label: "China", value: 3 },
-  //   { label: "Finland", value: 4 }
-  // ];
   const country1 = { label: "Bangladesh", value: 1 };
-  // console.log("FormGST", formValues.igst);
 
   const onSaveEdit = async () => {
     try {
@@ -254,49 +313,55 @@ function form() {
   };
   const subTotalCal = (discount: any, quantity: any, price: any) => {
     const total = (quantity * price * (100 - discount)) / 100;
-    totalCal();
+    setTimeout(() => {
+      totalCal();
+    }, 1000);
     return total;
   };
-  const totalCal = () => {
+  const totalCal = (labourCharge?:any,freight?:any,igst?:any,sgst?:any) => {
     const arrayObj: any | undefined = formValues?.itemList;
     console.log("arrayObj", arrayObj);
-
-    let totalSubTotal: any = 0;
-
+    
+    let totalSubTotal: number = 0;
+    
     for (const currentValue of arrayObj) {
-      // Assuming an asynchronous operation here
-      // const result = await someAsyncOperation(currentValue);
-      totalSubTotal += currentValue.subTotal;
+      totalSubTotal += parseInt(currentValue.subTotal);
     }
-    const total = parseInt((formValues.labourCharge) || 0) + parseInt((formValues?.freight) || 0) + parseInt(totalSubTotal)
-    setValue("totalAmount",total)
+    const total:any =
+    parseFloat(labourCharge ? labourCharge : formValues?.labourCharge  || 0) +
+    parseFloat(freight ? freight :formValues?.freight || 0) +
+    totalSubTotal;
+    setValue("totalAmount", parseInt(total));
+    // setValue("GSTValue", formValues.igst?.value);
     
-    if(formValues.gstType?.value == "1"){
-      const gstPer = 1 + (parseInt(formValues.igst?.value || ""))/100
-      console.log("gst%",gstPer)
-      const TotalWithGST = total*gstPer;
-      setValue("totalAmountGst",TotalWithGST)
+    console.log("TotalCall",total)
+    console.log("GSTValue", igst,sgst)
+    if (formValues.gstType?.value == "1") {
+      const gstPer = 1 + parseFloat(igst ? igst : formValues.igst?.value || "") / 100;
+      // console.log("gst%", gstPer);
+      const TotalWithGST:any = total * gstPer;
+      setValue("totalAmountGst", parseInt(TotalWithGST));
     }
-    if(formValues.gstType?.value == "2"){
-      const gstPer = 1 + (parseInt(formValues.cgst?.value || ""))/100 + (parseInt(formValues.sgst?.value || ""))/100
-      const TotalWithGST = total*gstPer;
-      setValue("totalAmountGst",TotalWithGST)
+    if (formValues.gstType?.value == "2") {
+      const gstPer =
+        1 +
+        parseFloat(sgst ? sgst :formValues.cgst?.value || "") / 100 +
+        parseFloat(sgst ? sgst :formValues.sgst?.value || "") / 100;
+      const TotalWithGST:any = total * gstPer;
+      setValue("totalAmountGst", parseInt(TotalWithGST));
     }
-    
-    // console.log("total", total); 
+
   };
-  // console.log("FormData------>", formValues);
   return (
     <>
-      <div className="flex flex-col items-center py-2 bg-slate-50">
+      <div>
+        <h1 className="block uppercase tracking-wide text-center text-gray-700 font-bold mb-8 text-3xl">
+          Create Invoice
+        </h1>
+        <hr className="mb-2"></hr>
         <form className="w-full p-4" onSubmit={handleSubmit(onSubmit)}>
-          <h1 className="block uppercase tracking-wide text-center text-gray-700 font-bold mb-8 text-3xl">
-            Create Invoice
-          </h1>
-
-          <hr className="mb-2"></hr>
-          <div className="flex flex-wrap -mx-3 mb-6">
-            <div className="w-full md:w-1/12 px-3 mb-6 md:mb-0">
+          <div className="row flex justify-between">
+            <div className="col-2">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                 htmlFor="grid-first-name"
@@ -305,7 +370,7 @@ function form() {
               </label>
               <input
                 //error={errors.invoiceNo?.message}
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                className="text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
                 id="grid-first-name"
                 type="text"
                 placeholder="Enter Invoice Number"
@@ -313,8 +378,7 @@ function form() {
               />
               <p>{errors.invoiceNo?.message}</p>
             </div>
-            <div className="w-full md:w-10/12 px-3"></div>
-            <div className="w-full md:w-1/12 px-3">
+            <div className="col-2">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                 htmlFor="grid-last-name"
@@ -322,16 +386,17 @@ function form() {
                 Date
               </label>
               <input
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                id="grid-first-name"
-                type="text"
+                className="text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                type="date"
                 {...register("Date")}
                 placeholder="Enter Date"
               />
             </div>
           </div>
-          <div className="flex flex-wrap -mx-3 mb-6">
-            <div className="w-full w-full md:w-1/2 px-3">
+          <hr className="mb-2"></hr>
+
+          <div className="row flex flex-wrap mx-3 mb-6">
+            <div className="col-6">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                 htmlFor="grid-password"
@@ -351,14 +416,20 @@ function form() {
                     // shouldValidate: true,
                   });
                 }}
-                // value={country.find((c) => c.value === field.value)}
-                // onChange={(val) => field.onChange(val.value)}
-                // defaultValue={country.find((c) => c.value === countryValue?.value)}
               />
-              <p>{errors.invoiceNo?.message}</p>
-              {/* </Select> */}
+              <label
+                className="block uppercase tracking-wide text-gray-700 text-xs font-bold my-2"
+                htmlFor="grid-password"
+              >
+                Address
+              </label>
+              <input
+                className="w-100 text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                type="text"
+                placeholder="Enter Date"
+              />
             </div>
-            <div className="w-full w-full md:w-1/2 px-3">
+            <div className="col-6">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                 htmlFor="grid-password"
@@ -378,13 +449,21 @@ function form() {
                     // shouldValidate: true,
                   });
                 }}
-                // value={country.find((c) => c.value === field.value)}
-                // onChange={(val) => field.onChange(val.value)}
-                // defaultValue={country.find((c) => c.value === countryValue?.value)}
+              />
+              <label
+                className="block uppercase tracking-wide text-gray-700 text-xs font-bold my-2"
+                htmlFor="grid-password"
+              >
+                Address
+              </label>
+              <input
+                className="w-100 text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                type="text"
+                placeholder="Enter Date"
               />
             </div>
           </div>
-          <Table className="table-sm table table-bordered" responsive>
+          <Table className="table-sm table table-bordered bg-white" responsive>
             <thead>
               <tr>
                 <th>Sr. No.</th>
@@ -394,32 +473,17 @@ function form() {
                 <th>Unit Price</th>
                 <th>Discount %</th>
                 <th>Total</th>
-                <th style={{ textAlign: "center" }}>Action</th>
-                <th>
-                  <FaPlus
-                    onClick={() =>
-                      append({
-                        _id: "",
-                        description: "",
-                        qty: 0,
-                        unit: "",
-                        unitPrice: 0,
-                        discount: 0,
-                        subTotal: 0,
-                      })
-                    }
-                  />
-                </th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {fields.map((item, index) => (
                 <tr key={index}>
-                  <td>{index + 1}</td>
+                  <td className="pt-3">{index + 1}</td>
 
                   <td>
                     <input
-                      className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                      className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
                       type="text"
                       {...register(`itemList.${index}.description`)}
                       placeholder="Enter Description"
@@ -427,7 +491,7 @@ function form() {
                   </td>
                   <td>
                     <input
-                      className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                      className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
                       id="grid-first-name"
                       type="text"
                       placeholder="Enter Unit"
@@ -436,7 +500,7 @@ function form() {
                   </td>
                   <td>
                     <input
-                      className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                      className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
                       id="grid-first-name"
                       type="text"
                       placeholder="Enter Quantity"
@@ -466,7 +530,7 @@ function form() {
 
                   <td>
                     <input
-                      className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                      className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
                       id="grid-first-name"
                       type="text"
                       placeholder="Enter Unit Price"
@@ -497,7 +561,7 @@ function form() {
 
                   <td>
                     <input
-                      className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                      className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
                       id="grid-first-name"
                       type="text"
                       placeholder="Discount"
@@ -527,7 +591,7 @@ function form() {
                   </td>
                   <td>
                     <input
-                      className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                      className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
                       id="grid-first-name"
                       type="text"
                       // disabled={true}
@@ -539,8 +603,21 @@ function form() {
                       {...register(`itemList.${index}.subTotal`)}
                     />
                   </td>
-                  <td>
-                    <FaTrash onClick={() => remove(index)} />
+                  <td className="flex pt-3">
+                    {index > 0 && <FaTrash onClick={() => remove(index)} />}
+                    <FaPlus
+                      onClick={() =>
+                        append({
+                          _id: "",
+                          description: "",
+                          qty: 0,
+                          unit: "",
+                          unitPrice: 0,
+                          discount: 0,
+                          subTotal: 0,
+                        })
+                      }
+                    />
                   </td>
                 </tr>
               ))}
@@ -555,10 +632,20 @@ function form() {
                 Laboar Charges
               </label>
               <input
-                className="appearance-none blockgffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffggg w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                className="w-100 text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
                 id="grid-city"
                 type="number"
-                {...register("labourCharge")}
+                onChange={(e) => {
+                  setValue(
+                    "labourCharge",
+                    (e.target.value),
+                    {
+                      shouldValidate: true,
+                    },
+                    
+                  );
+                  totalCal(e.target.value)
+                }}
                 placeholder="Enter Labour Charge"
               />
             </div>
@@ -570,12 +657,19 @@ function form() {
                 Freight
               </label>
               <input
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                className="w-100 text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
                 id="grid-zip"
                 type="number"
-                {...register("freight", {
-                  valueAsNumber: true, // Treat the value as a number
-                })}
+                onChange={(e) => {
+                  setValue(
+                    "freight",
+                    (e.target.value),
+                    {
+                      shouldValidate: true,
+                    }
+                  );
+                  totalCal(0,e.target.value)
+                }}
                 placeholder="Enter Freightl"
               />
             </div>
@@ -586,7 +680,7 @@ function form() {
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                 htmlFor="grid-zip"
               >
-                GST
+                GST Type
               </label>
               <Select
                 isSearchable={true}
@@ -628,6 +722,7 @@ function form() {
                       shouldValidate: true,
                     });
                     setValue("igst.value", selected.value, {});
+                    totalCal(0,0,selected.value);
                     setValue("sgst", {});
                     setValue("cgst", {});
                   }}
@@ -651,6 +746,7 @@ function form() {
                       setValue("cgst.label", selected.label, {
                         shouldValidate: true,
                       });
+                      totalCal(0,0,0,selected.value);
                       setValue("cgst.value", selected.value, {});
                       setValue("sgst.label", selected.label, {});
                       setValue("sgst.value", selected.value, {});
@@ -674,6 +770,7 @@ function form() {
                       setValue("sgst.label", selected.label, {
                         shouldValidate: true,
                       });
+                      totalCal(0,0,0,selected.value);
                       setValue("sgst.value", selected.value, {});
                       setValue("cgst.label", selected.label, {});
                       setValue("cgst.value", selected.value, {});
@@ -695,21 +792,8 @@ function form() {
                 Total Amount
               </label>
               <input
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                className="w-100 text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
                 id="grid-zip"
-                // value=
-                // {
-                // ((formValues.itemList?.[index]?.qty as any) || 0) *
-                //   ((formValues.itemList?.[index]?.unitPrice as any) ||
-                //     0) -
-                // ((formValues.itemList?.[index]?.qty as any) || 0) *
-                //   ((formValues.itemList?.[index]?.unitPrice as any) ||
-                //     0) *
-                //   (((formValues.itemList?.[index]?.discount as any) ||
-                //     0) /
-                //     100)
-                // }
-
                 type="number"
                 disabled={true}
                 {...register("totalAmount")}
@@ -726,10 +810,11 @@ function form() {
                 Total Amount With GST
               </label>
               <input
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                className="w-100 text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
                 id="grid-zip"
                 type="number"
                 disabled={true}
+                value={(formValues?.totalAmountGst)}
                 {...register("totalAmountGst")}
                 placeholder="Total Amount"
               />
@@ -751,7 +836,8 @@ function form() {
               {"Cancel"}
             </button>
             <button
-              onClick={() => router.push("invoice/template")}
+              // onClick={() => router.push("/invoice/template")}
+              onClick={() => downloadPDF()}
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-4"
             >
               {"View Report"}

@@ -107,7 +107,7 @@ function template() {
         useCORS: true,
         scrollY: 0,
       },
-      jsPDF: { unit: "pt", format: "a4", orientation: "landscape" },
+      jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
     };
     console.log("html", html);
     // Generate PDF using html2pdf
