@@ -1,5 +1,5 @@
 import { connect } from "@/dbConfig/dbConfig";
-import Customer from "@/models/customerModel";
+import Invoice from "@/models/invoice";
 import { NextRequest, NextResponse } from "next/server";
 
 
@@ -9,32 +9,35 @@ export async function POST(request: NextRequest) {
   try {
 
     const reqBody = await request.json();
-    const { _id,customerName, gstNo, address, contactPerson, contactDetail } =
+    const { _id,invoiceNo, date, shipTo, billTo, labourCharges, freight,gstType,igst,cgst,sgst,totalAmount,totalAmountGST} =
       reqBody;
     //add customer
     if(reqBody._id){
       console.log("Reach Edit")
       console.log(reqBody._id)
-      const customer = await Customer.findOneAndUpdate({
+      const invoice = await Invoice.findOneAndUpdate({
         _id: reqBody._id
       },{
         ...reqBody
     });
 
-      console.log("Customer",customer)
+      console.log("Invoice",invoice)
 
       return NextResponse.json({
-        message: "Customer Updated",
+        message: "Invoice Updated",
         success: true
       });
     }
     else {
+      const invoice = await Invoice.create({_id,invoiceNo, date, shipTo, billTo, labourCharges, freight,gstType,igst,cgst,sgst,totalAmount,totalAmountGST})
+      console.log("Invoice Reach Add",invoice)
       
-      const customer = await Customer.create({  _id,customerName, gstNo, address, contactPerson, contactDetail})
-      console.log("Customer Reach Add",customer)
+
+      // const invoice = await Invoice.create({})
+      // console.log("Customer Reach Add",invoice)
       
       return NextResponse.json({
-        message: "Customer saved",
+        message: "Invoice saved",
         success: true,
       });
     }

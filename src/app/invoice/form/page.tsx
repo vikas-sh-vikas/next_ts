@@ -15,7 +15,7 @@ import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.css";
 
 type CustomerModel = {
-  invoiceNo: string;
+  invoiceNo: number;
   Date?: string;
   shipTo?: {
     label?: string;
@@ -23,25 +23,25 @@ type CustomerModel = {
   };
   billTo?: {
     label?: string;
-    value?: string;
+    value?: number;
   };
-  labourCharge?: any;
-  freight?: any;
+  labourCharge?: number;
+  freight?: number;
   gstType?: {
     label?: string;
-    value?: string;
+    value?: number | undefined;
   };
   igst?: {
     label?: string;
-    value?: string;
+    value?:  number | undefined;
   };
   sgst?: {
     label?: string;
-    value?: string;
+    value?:  number | undefined;
   };
   cgst?: {
     label?: string;
-    value?: string;
+    value?:  number | undefined;
   };
   totalAmount?: number;
   totalAmountGst?: number;
@@ -62,7 +62,7 @@ function form() {
   const [selectOptionShip, setSelectOptionShip] = useState([{}]);
 
   const defaultValues: CustomerModel = {
-    invoiceNo: "",
+    invoiceNo: 0,
     Date: "",
     labourCharge: 0,
     freight: 0,
@@ -223,7 +223,7 @@ function form() {
   };
   const schema = yup
     .object({
-      invoiceNo: yup.string().required("Required"),
+      invoiceNo: yup.number().required("Required"),
       Date: yup.string(),
       shipTo: yup.object({
         label: yup.string(),
@@ -282,13 +282,50 @@ function form() {
     name: "itemList",
   });
   const formValues = getValues();
-  const onSubmit: SubmitHandler<CustomerModel> = (data) => {
-    console.log("submit_data==========>", data);
+  const onSubmit: SubmitHandler<CustomerModel> = async (data) => {
+    const {
+      itemList,
+      shipTo,
+      billTo,
+      igst,
+      gstType,
+      sgst,
+      cgst,
+      ...formvaluesFilter
+    } = data;
+    const payloadWithGst = {
+      ...formvaluesFilter,
+      gstType: data.gstType?.value,
+      igst: data.gstType?.value == 1 ? data.igst?.value : 0,
+      sgst:data.gstType?.value == 2 ? data.sgst?.value: 0,
+      cgst: data.gstType?.value == 2 ? data.cgst?.value: 0,
+      billTo : data.billTo?.value,
+      shipTo : data.shipTo?.value
+    };
+    try {
+      const payload = {
+        data: payloadWithGst
+      };
+      // console.log("Payload-------->", payload);
+      // console.log(customer);
+      const response = await axios.post(
+        "/api/invoice/saveinvoice",
+        payload
+      );
+      console.log("Save sucess", response.data);
+      toast.success("Save success");
+      router.push("/invoice");
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
   const country1 = { label: "Bangladesh", value: 1 };
 
   const onSaveEdit = async () => {
     try {
+      const { itemList, ...payloadnew } = formValues;
+
+      console.log("New OBJ", payloadnew);
       const payload = {
         data: {
           invoicename: invoice,
@@ -318,39 +355,44 @@ function form() {
     }, 1000);
     return total;
   };
-  const totalCal = (labourCharge?:any,freight?:any,igst?:any,sgst?:any) => {
+  const totalCal = (
+    labourCharge?: any,
+    freight?: any,
+    igst?: any,
+    sgst?: any
+  ) => {
     const arrayObj: any | undefined = formValues?.itemList;
     console.log("arrayObj", arrayObj);
-    
+
     let totalSubTotal: number = 0;
-    
+
     for (const currentValue of arrayObj) {
       totalSubTotal += parseInt(currentValue.subTotal);
     }
-    const total:any =
-    parseFloat(labourCharge ? labourCharge : formValues?.labourCharge  || 0) +
-    parseFloat(freight ? freight :formValues?.freight || 0) +
-    totalSubTotal;
+    const total: any =
+      parseFloat(labourCharge ? labourCharge : formValues?.labourCharge || 0) +
+      parseFloat(freight ? freight : formValues?.freight || 0) +
+      totalSubTotal;
     setValue("totalAmount", parseInt(total));
     // setValue("GSTValue", formValues.igst?.value);
-    
-    console.log("TotalCall",total)
-    console.log("GSTValue", igst,sgst)
-    if (formValues.gstType?.value == "1") {
-      const gstPer = 1 + parseFloat(igst ? igst : formValues.igst?.value || "") / 100;
+
+    console.log("TotalCall", total);
+    console.log("GSTValue", igst, sgst);
+    if (formValues.gstType?.value == 1) {
+      const gstPer =
+        1 + parseFloat(igst ? igst : formValues.igst?.value || "") / 100;
       // console.log("gst%", gstPer);
-      const TotalWithGST:any = total * gstPer;
+      const TotalWithGST: any = total * gstPer;
       setValue("totalAmountGst", parseInt(TotalWithGST));
     }
-    if (formValues.gstType?.value == "2") {
+    if (formValues.gstType?.value == 2) {
       const gstPer =
         1 +
-        parseFloat(sgst ? sgst :formValues.cgst?.value || "") / 100 +
-        parseFloat(sgst ? sgst :formValues.sgst?.value || "") / 100;
-      const TotalWithGST:any = total * gstPer;
+        parseFloat(sgst ? sgst : formValues.cgst?.value || "") / 100 +
+        parseFloat(sgst ? sgst : formValues.sgst?.value || "") / 100;
+      const TotalWithGST: any = total * gstPer;
       setValue("totalAmountGst", parseInt(TotalWithGST));
     }
-
   };
   return (
     <>
@@ -360,7 +402,7 @@ function form() {
         </h1>
         <hr className="mb-2"></hr>
         <form className="w-full p-4" onSubmit={handleSubmit(onSubmit)}>
-          <div className="row flex justify-between">
+          <div className="row flex flax-wrap mx-3 mb-6 justify-between">
             <div className="col-2">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -374,7 +416,10 @@ function form() {
                 id="grid-first-name"
                 type="text"
                 placeholder="Enter Invoice Number"
-                {...register("invoiceNo")}
+                onChange={(e) => {
+                  setValue("invoiceNo", parseInt(e.target.value));
+                }}
+                // {...register("invoiceNo")}
               />
               <p>{errors.invoiceNo?.message}</p>
             </div>
@@ -463,168 +508,173 @@ function form() {
               />
             </div>
           </div>
-          <Table className="table-sm table table-bordered bg-white" responsive>
-            <thead>
-              <tr>
-                <th>Sr. No.</th>
-                <th>Description</th>
-                <th>Unit</th>
-                <th>Qty.</th>
-                <th>Unit Price</th>
-                <th>Discount %</th>
-                <th>Total</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {fields.map((item, index) => (
-                <tr key={index}>
-                  <td className="pt-3">{index + 1}</td>
-
-                  <td>
-                    <input
-                      className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
-                      type="text"
-                      {...register(`itemList.${index}.description`)}
-                      placeholder="Enter Description"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
-                      id="grid-first-name"
-                      type="text"
-                      placeholder="Enter Unit"
-                      {...register(`itemList.${index}.unit`)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
-                      id="grid-first-name"
-                      type="text"
-                      placeholder="Enter Quantity"
-                      // {...register(`itemList.${index}.qty`)}
-                      onChange={(e) => {
-                        setValue(
-                          `itemList.${index}.subTotal`,
-                          subTotalCal(
-                            formValues.itemList?.[index]?.discount,
-                            e.target.value,
-                            formValues.itemList?.[index]?.unitPrice
-                          ),
-                          {
-                            shouldValidate: true,
-                          }
-                        );
-                        setValue(
-                          `itemList.${index}.qty`,
-                          parseInt(e.target.value),
-                          {
-                            shouldValidate: true,
-                          }
-                        );
-                      }}
-                    />
-                  </td>
-
-                  <td>
-                    <input
-                      className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
-                      id="grid-first-name"
-                      type="text"
-                      placeholder="Enter Unit Price"
-                      // {...register(`itemList.${index}.unitPrice`)}
-                      onChange={(e) => {
-                        setValue(
-                          `itemList.${index}.subTotal`,
-                          subTotalCal(
-                            formValues.itemList?.[index]?.discount,
-                            formValues.itemList?.[index]?.qty,
-                            e.target.value
-                          ),
-                          {
-                            shouldValidate: true,
-                          }
-                        );
-                        setValue(
-                          `itemList.${index}.unitPrice`,
-                          parseInt(e.target.value),
-                          {
-                            shouldValidate: true,
-                          }
-                        );
-                      }}
-                    />
-                    <form action="" method="get"></form>
-                  </td>
-
-                  <td>
-                    <input
-                      className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
-                      id="grid-first-name"
-                      type="text"
-                      placeholder="Discount"
-                      // {...register(`itemList.${index}.discount`)}
-                      onChange={(e) => {
-                        setValue(
-                          `itemList.${index}.discount`,
-                          parseInt(e.target.value),
-                          {
-                            shouldValidate: true,
-                          }
-                        );
-                        setValue(
-                          `itemList.${index}.subTotal`,
-                          subTotalCal(
-                            e.target.value,
-                            formValues.itemList?.[index]?.qty,
-                            formValues.itemList?.[index]?.unitPrice
-                          ),
-                          {
-                            shouldValidate: true,
-                          }
-                        );
-                        // subTotalCal(e.target.value, formValues.itemList?.[index]?.qty, formValues.itemList?.[index]?.unitPrice)
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
-                      id="grid-first-name"
-                      type="text"
-                      // disabled={true}
-                      placeholder="Total"
-                      // onChange={(e) => {
-                      //   console.log(e)
-                      // }}
-                      value={formValues?.itemList?.[index].subTotal}
-                      {...register(`itemList.${index}.subTotal`)}
-                    />
-                  </td>
-                  <td className="flex pt-3">
-                    {index > 0 && <FaTrash onClick={() => remove(index)} />}
-                    <FaPlus
-                      onClick={() =>
-                        append({
-                          _id: "",
-                          description: "",
-                          qty: 0,
-                          unit: "",
-                          unitPrice: 0,
-                          discount: 0,
-                          subTotal: 0,
-                        })
-                      }
-                    />
-                  </td>
+          <div className="mx-6 mb-6">
+            <Table
+              className="table-lg table table-bordered bg-white mb-6"
+              responsive
+            >
+              <thead>
+                <tr>
+                  <th>Sr. No.</th>
+                  <th>Description</th>
+                  <th>Unit</th>
+                  <th>Qty.</th>
+                  <th>Unit Price</th>
+                  <th>Discount %</th>
+                  <th>Total</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
-          <div className="flex flex-wrap -mx-3 mb-2">
-            <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0">
+              </thead>
+              <tbody>
+                {fields.map((item, index) => (
+                  <tr key={index}>
+                    <td className="pt-3">{index + 1}</td>
+
+                    <td>
+                      <input
+                        className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
+                        type="text"
+                        {...register(`itemList.${index}.description`)}
+                        placeholder="Enter Description"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
+                        id="grid-first-name"
+                        type="text"
+                        placeholder="Enter Unit"
+                        {...register(`itemList.${index}.unit`)}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
+                        id="grid-first-name"
+                        type="text"
+                        placeholder="Enter Quantity"
+                        // {...register(`itemList.${index}.qty`)}
+                        onChange={(e) => {
+                          setValue(
+                            `itemList.${index}.subTotal`,
+                            subTotalCal(
+                              formValues.itemList?.[index]?.discount,
+                              e.target.value,
+                              formValues.itemList?.[index]?.unitPrice
+                            ),
+                            {
+                              shouldValidate: true,
+                            }
+                          );
+                          setValue(
+                            `itemList.${index}.qty`,
+                            parseInt(e.target.value),
+                            {
+                              shouldValidate: true,
+                            }
+                          );
+                        }}
+                      />
+                    </td>
+
+                    <td>
+                      <input
+                        className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
+                        id="grid-first-name"
+                        type="text"
+                        placeholder="Enter Unit Price"
+                        // {...register(`itemList.${index}.unitPrice`)}
+                        onChange={(e) => {
+                          setValue(
+                            `itemList.${index}.subTotal`,
+                            subTotalCal(
+                              formValues.itemList?.[index]?.discount,
+                              formValues.itemList?.[index]?.qty,
+                              e.target.value
+                            ),
+                            {
+                              shouldValidate: true,
+                            }
+                          );
+                          setValue(
+                            `itemList.${index}.unitPrice`,
+                            parseInt(e.target.value),
+                            {
+                              shouldValidate: true,
+                            }
+                          );
+                        }}
+                      />
+                      <form action="" method="get"></form>
+                    </td>
+
+                    <td>
+                      <input
+                        className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
+                        id="grid-first-name"
+                        type="text"
+                        placeholder="Discount"
+                        // {...register(`itemList.${index}.discount`)}
+                        onChange={(e) => {
+                          setValue(
+                            `itemList.${index}.discount`,
+                            parseInt(e.target.value),
+                            {
+                              shouldValidate: true,
+                            }
+                          );
+                          setValue(
+                            `itemList.${index}.subTotal`,
+                            subTotalCal(
+                              e.target.value,
+                              formValues.itemList?.[index]?.qty,
+                              formValues.itemList?.[index]?.unitPrice
+                            ),
+                            {
+                              shouldValidate: true,
+                            }
+                          );
+                          // subTotalCal(e.target.value, formValues.itemList?.[index]?.qty, formValues.itemList?.[index]?.unitPrice)
+                        }}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
+                        id="grid-first-name"
+                        type="text"
+                        // disabled={true}
+                        placeholder="Total"
+                        // onChange={(e) => {
+                        //   console.log(e)
+                        // }}
+                        value={formValues?.itemList?.[index].subTotal}
+                        {...register(`itemList.${index}.subTotal`)}
+                      />
+                    </td>
+                    <td className="flex pt-3">
+                      {index > 0 && <FaTrash onClick={() => remove(index)} />}
+                      <FaPlus
+                        onClick={() =>
+                          append({
+                            _id: "",
+                            description: "",
+                            qty: 0,
+                            unit: "",
+                            unitPrice: 0,
+                            discount: 0,
+                            subTotal: 0,
+                          })
+                        }
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
+          <div className="row flex flex-wrap mx-3 mb-6">
+            <div className="w-full col-6">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                 htmlFor="grid-city"
@@ -636,20 +686,15 @@ function form() {
                 id="grid-city"
                 type="number"
                 onChange={(e) => {
-                  setValue(
-                    "labourCharge",
-                    (e.target.value),
-                    {
-                      shouldValidate: true,
-                    },
-                    
-                  );
-                  totalCal(e.target.value)
+                  setValue("labourCharge", parseInt(e.target.value), {
+                    shouldValidate: true,
+                  });
+                  totalCal(e.target.value);
                 }}
                 placeholder="Enter Labour Charge"
               />
             </div>
-            <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0">
+            <div className="w-full col-6">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                 htmlFor="grid-zip"
@@ -661,21 +706,17 @@ function form() {
                 id="grid-zip"
                 type="number"
                 onChange={(e) => {
-                  setValue(
-                    "freight",
-                    (e.target.value),
-                    {
-                      shouldValidate: true,
-                    }
-                  );
-                  totalCal(0,e.target.value)
+                  setValue("freight", parseInt(e.target.value), {
+                    shouldValidate: true,
+                  });
+                  totalCal(0, e.target.value);
                 }}
                 placeholder="Enter Freightl"
               />
             </div>
           </div>
-          <div className="flex flex-wrap -mx-3 mb-2">
-            <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0">
+          <div className="row flex flex-wrap mx-3 mb-6">
+            <div className="w-full col-3">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                 htmlFor="grid-zip"
@@ -689,23 +730,23 @@ function form() {
                 options={[
                   {
                     label: "IGST",
-                    value: "1",
+                    value: 1,
                   },
                   {
                     label: "CGST/SGST",
-                    value: "2",
+                    value: 2,
                   },
                 ]}
                 onChange={(selected: any) => {
                   setValue("gstType.label", selected.label, {
                     shouldValidate: true,
                   });
-                  setValue("gstType.value", selected.value, {});
+                  setValue("gstType.value", parseInt(selected.value), {});
                 }}
               />
             </div>
-            {formValues.gstType?.value == "1" ? (
-              <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0">
+            {formValues.gstType?.value == 1 ? (
+              <div className="w-full col-3">
                 <label
                   className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                   htmlFor="grid-zip"
@@ -721,16 +762,16 @@ function form() {
                     setValue("igst.label", selected.label, {
                       shouldValidate: true,
                     });
-                    setValue("igst.value", selected.value, {});
-                    totalCal(0,0,selected.value);
+                    setValue("igst.value", parseInt(selected.value), {});
+                    totalCal(0, 0, selected.value);
                     setValue("sgst", {});
                     setValue("cgst", {});
                   }}
                 />
               </div>
-            ) : formValues.gstType?.value == "2" ? (
+            ) : formValues.gstType?.value == 2 ? (
               <>
-                <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0">
+                <div className="w-full col-3">
                   <label
                     className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                     htmlFor="grid-zip"
@@ -743,18 +784,18 @@ function form() {
                     value={formValues?.cgst}
                     options={sgstOptions}
                     onChange={(selected: any) => {
-                      setValue("cgst.label", selected.label, {
+                      setValue("cgst.label", (selected.label), {
                         shouldValidate: true,
                       });
-                      totalCal(0,0,0,selected.value);
-                      setValue("cgst.value", selected.value, {});
+                      totalCal(0, 0, 0, selected.value);
+                      setValue("cgst.value", parseInt(selected.value), {});
                       setValue("sgst.label", selected.label, {});
-                      setValue("sgst.value", selected.value, {});
+                      setValue("sgst.value", parseInt(selected.value), {});
                       setValue("igst", {});
                     }}
                   />
                 </div>
-                <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0">
+                <div className="w-full col-3">
                   <label
                     className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                     htmlFor="grid-zip"
@@ -770,10 +811,10 @@ function form() {
                       setValue("sgst.label", selected.label, {
                         shouldValidate: true,
                       });
-                      totalCal(0,0,0,selected.value);
-                      setValue("sgst.value", selected.value, {});
+                      totalCal(0, 0, 0, selected.value);
+                      setValue("sgst.value", parseInt(selected.value), {});
                       setValue("cgst.label", selected.label, {});
-                      setValue("cgst.value", selected.value, {});
+                      setValue("cgst.value", parseInt(selected.value), {});
                       setValue("igst", {});
                     }}
                   />
@@ -783,8 +824,8 @@ function form() {
               <></>
             )}
           </div>
-          <div className="flex flex-wrap -mx-3 mb-2">
-            <div className="w-full w-full md:w-1/2 px-3">
+          <div className="row w-full flex flex-wrap mx-3 mb-6">
+            <div className="w-full col-3">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                 htmlFor="grid-password"
@@ -801,8 +842,8 @@ function form() {
               />
             </div>
           </div>
-          <div className="flex flex-wrap -mx-3 mb-2">
-            <div className="w-full w-full md:w-1/2 px-3">
+          <div className="row flex flex-wrap mx-3 mb-6">
+            <div className="w-full col-3">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                 htmlFor="grid-password"
@@ -814,7 +855,7 @@ function form() {
                 id="grid-zip"
                 type="number"
                 disabled={true}
-                value={(formValues?.totalAmountGst)}
+                value={formValues?.totalAmountGst}
                 {...register("totalAmountGst")}
                 placeholder="Total Amount"
               />
