@@ -7,13 +7,13 @@ connect();
 
 export async function POST(request: NextRequest) {
   try {
+    console.log("Reach Save API")
 
     const reqBody = await request.json();
     const { _id,customerName, gstNo, address, contactPerson, contactDetail } =
       reqBody;
     //add customer
     if(reqBody._id){
-      console.log("Reach Edit")
       console.log(reqBody._id)
       const customer = await Customer.findOneAndUpdate({
         _id: reqBody._id

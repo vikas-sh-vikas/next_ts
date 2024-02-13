@@ -7,11 +7,20 @@ import { useRouter } from "next/navigation";
 import Pagination from "@/components/pagination/pagination";
 type CustomerModel = {
   _id: string;
-  customerName: string;
-  gstNo: string;
-  address: string;
-  contactPerson: string;
-  contactDetail: string;
+  invoiceNo: number;
+  date?: string;
+  shipTo?: string
+  shipToName?: string
+  billTo?: string
+  billToName?: string
+  labourCharge?: number;
+  freight?: number;
+  gstType?: number;
+  igst?: number;
+  sgst?: number;
+  cgst?: number;
+  totalAmount?: number;
+  totalAmountGst?: number;
 };
 function index() {
   const router = useRouter();
@@ -25,7 +34,7 @@ function index() {
     getCustomerdetails();
   }, []);
   const getCustomerdetails = async () => {
-    const res = await axios.get("/api/customers/getcustomer");
+    const res = await axios.get("/api/invoice/getInvoice");
     const TotalNoofPages = (res.data.data).length;
     setData(res.data.data);
     console.log("TotalNumberofPages", TotalNoofPages)
@@ -34,7 +43,7 @@ function index() {
   // console.log("Data", data);
   const editFunction = async (id: string) => {
     console.log("Clicked edit", id);
-    router.push("/customer/form?id=" + id);
+    router.push("/invoice/form?id=" + id);
   };
   const deleteFunction = async (id: string, customerName: string) => {
     const data = {
@@ -49,7 +58,7 @@ function index() {
       id: customerId,
     };
     try {
-      const response = await axios.post(`/api/customers/deleteCustomer`, data);
+      const response = await axios.post(`/api/invoice/deleteInvoice`, data);
       await setModal(!modal)
       getCustomerdetails();
     } catch (error: any) {
@@ -95,22 +104,19 @@ function index() {
               Sr. No.
             </th>
             <th scope="col" className="px-6 py-3">
-              Customer Name
+              Bill To
             </th>
             <th scope="col" className="px-6 py-3">
-              GST No.
+              Date
             </th>
             <th scope="col" className="px-6 py-3">
-              Address
+              Invoice No.
             </th>
             <th scope="col" className="px-6 py-3">
-              Contact Person
+              Total Amount
             </th>
             <th scope="col" className="px-6 py-3">
               Contact Detail
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Action
             </th>
           </tr>
         </thead>
@@ -118,11 +124,10 @@ function index() {
           return (
             <tr className="bg-white dark:bg-gray-800">
               <td className="px-6 py-4">{idx + 1}</td>
-              <td className="px-6 py-4">{item?.customerName}</td>
-              <td className="px-6 py-4">{item?.gstNo}</td>
-              <td className="px-6 py-4">{item?.address}</td>
-              <td className="px-6 py-4">{item?.contactPerson}</td>
-              <td className="px-6 py-4">{item?.contactDetail}</td>
+              <td className="px-6 py-4">{item?.billToName}</td>
+              <td className="px-6 py-4">{item?.date}</td>
+              <td className="px-6 py-4">{item?.invoiceNo}</td>
+              <td className="px-6 py-4">{item?.totalAmount}</td>
               <td className="px-6 py-4 flex flex-row">
                 <div
                   className="text-black cursor-pointer"
@@ -140,7 +145,7 @@ function index() {
                 </div>
 
                 <button
-                  onClick={() => deleteFunction(item?._id, item?.customerName)}
+                  onClick={() => deleteFunction(item?._id, item?.billToName as any)}
                   id="deleteButton"
                   data-modal-target="deleteModal"
                   data-modal-toggle="deleteModal"
@@ -259,7 +264,7 @@ function index() {
                 className="py-2 px-3 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-900"
               >
                 Yes, I'm sure
-              </button>s
+              </button>
             </div>
           </div>
         </div>

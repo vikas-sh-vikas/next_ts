@@ -1,5 +1,5 @@
 import { connect } from "@/dbConfig/dbConfig";
-import Invoice from "@/models/invoice";
+import Invoice from "@/models/invoiceModel";
 import { NextRequest, NextResponse } from "next/server";
 
 
@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   try {
 
     const reqBody = await request.json();
-    const { _id,invoiceNo, date, shipTo, billTo, labourCharges, freight,gstType,igst,cgst,sgst,totalAmount,totalAmountGST} =
+    const { _id,invoiceNo, date, labourCharge, freight, totalAmount,totalAmountGst, gstType,igst,cgst,sgst,shipTo,shipToName,billTo,billToName} =
       reqBody;
     //add customer
     if(reqBody._id){
@@ -20,7 +20,6 @@ export async function POST(request: NextRequest) {
       },{
         ...reqBody
     });
-
       console.log("Invoice",invoice)
 
       return NextResponse.json({
@@ -29,19 +28,21 @@ export async function POST(request: NextRequest) {
       });
     }
     else {
-      const invoice = await Invoice.create({_id,invoiceNo, date, shipTo, billTo, labourCharges, freight,gstType,igst,cgst,sgst,totalAmount,totalAmountGST})
+      console.log("Reach Add")
+
+      const invoice = await Invoice.create({_id,invoiceNo, date, labourCharge, freight, totalAmount,totalAmountGst, gstType,igst,cgst,sgst,shipTo,shipToName,billTo,billToName})
       console.log("Invoice Reach Add",invoice)
       
 
-      // const invoice = await Invoice.create({})
-      // console.log("Customer Reach Add",invoice)
-      
       return NextResponse.json({
         message: "Invoice saved",
+        id: invoice._id,
         success: true,
       });
     }
-  } catch (error: any) {
-    return NextResponse.json({ erroer: error.message }), { status: 500 };
   }
+  catch (error: any) {
+    console.log("Reach Error")
+    return NextResponse.json({ error: error.message }, { status: 500 });
+}
 }

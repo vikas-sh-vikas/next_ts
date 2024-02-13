@@ -1,8 +1,6 @@
 "use client";
 
-import Header from "@/components/header/header";
 import axios from "axios";
-import { set } from "mongoose";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -16,7 +14,7 @@ import "bootstrap/dist/css/bootstrap.css";
 
 type CustomerModel = {
   invoiceNo: number;
-  Date?: string;
+  date?: string;
   shipTo?: {
     label?: string;
     value?: string;
@@ -46,7 +44,7 @@ type CustomerModel = {
   totalAmount?: number;
   totalAmountGst?: number;
   itemList?: {
-    _id?: string;
+    // _id?: string;
     description?: string;
     qty?: number;
     unit?: string;
@@ -58,19 +56,16 @@ type CustomerModel = {
 
 function form() {
   const router = useRouter();
-  const [invoice, setInvoice] = useState("");
   const [selectOptionShip, setSelectOptionShip] = useState([{}]);
-
   const defaultValues: CustomerModel = {
     invoiceNo: 0,
-    Date: "",
+    date: "",
     labourCharge: 0,
     freight: 0,
     totalAmount: 0,
     totalAmountGst: 0,
     itemList: [
       {
-        _id: "",
         description: "",
         qty: 0,
         unit: "",
@@ -80,50 +75,62 @@ function form() {
       },
     ],
   };
+  const [formData, setFormData] = useState<CustomerModel>(defaultValues);
+
+
   const urlparams = new URLSearchParams(location.search);
   const id = urlparams.get("id");
   const html2pdf = require("html2pdf.js");
-  const [customer, setCustomer] = useState<CustomerModel>(defaultValues);
   useEffect(() => {
     getCustomerdetails();
     if (id) {
-      getCustomerDetailByid();
+      getInvoiceDetailByid();
     }
-  }, []);
+  }, [id]);
   const gstOptions = [
     {
       label: "5%",
-      value: "5",
+      value: 5,
     },
     {
       label: "12%",
-      value: "12",
+      value: 12,
     },
     {
       label: "18%",
-      value: "18",
+      value: 18,
     },
     {
       label: "28%",
-      value: "28",
+      value: 28,
+    },
+  ];
+  const gstType = [
+    {
+      label: "IGST",
+      value: 1,
+    },
+    {
+      label: "CGST/SGST",
+      value: 2,
     },
   ];
   const sgstOptions = [
     {
       label: "2.5%",
-      value: "2.5",
+      value: 2.5,
     },
     {
       label: "6%",
-      value: "6",
+      value: 6,
     },
     {
       label: "9%",
-      value: "9",
+      value: 9,
     },
     {
       label: "14%",
-      value: "14",
+      value: 14,
     },
   ];
   const downloadPDF = async () => {
@@ -160,7 +167,7 @@ function form() {
         )
       )
       .replace("@invoiceNo@", formValues?.invoiceNo)
-      .replace("@date@", formValues?.Date)
+      .replace("@date@", formValues?.date)
       .replace("@shipTo@", formValues?.shipTo?.label)
       .replace("@billTo@", formValues?.billTo?.label)
       .replace("@labourCharge@", formValues?.labourCharge)
@@ -208,16 +215,41 @@ function form() {
       console.log("Error", error);
     }
   };
-  const getCustomerDetailByid = async () => {
+  const getInvoiceDetailByid = async () => {
     const data = {
       id: id,
     };
     // }
     try {
-      const response = await axios.post(`/api/customers/getCustomerById`, data);
-      const apiData = response.data.data;
-      setCustomer({ ...apiData });
-    } catch (error: any) {
+      const response = await axios.post(`/api/invoice/getInvoiceById`, data);
+      const apiData:any= response.data.data;
+      console.log("Invoice Number in Edit",apiData)
+      // setValue("invoiceNo",apiData.invoiceNo);;
+      setValue("invoiceNo", apiData.invoiceNo);
+      setValue("date", apiData.date);
+      setValue("labourCharge", apiData.labourCharge);
+      setValue("freight", apiData.freight);
+      // ... set other fields as needed
+      // Set shipTo and billTo
+      setValue("shipTo.label", apiData.shipToName);
+      setValue("shipTo.value", apiData.shipTo);
+      setValue("billTo.label", apiData.billToName);
+      setValue("billTo.value", apiData.billTo);
+      setValue("totalAmount", apiData.totalAmount);
+      const gstTypeFilter:any = gstType.filter((gstType) => gstType.value === apiData.gstType);   
+      const igstFilter:any = gstOptions.filter((gstType) => gstType.value === apiData.igst);   
+      const sgstTypeFilter:any = sgstOptions.filter((gstType) => gstType.value === apiData.sgst);   
+      const cgstTypeFilter:any = sgstOptions.filter((gstType) => gstType.value === apiData.cgst);   
+      setValue("gstType.value",gstTypeFilter[0].value);
+      setValue("gstType.label",gstTypeFilter[0].label);
+      setValue("igst",igstFilter);
+      setValue("cgst",sgstTypeFilter);
+      setValue("sgst",cgstTypeFilter);
+      
+      // console.log("gstType",gstTypeFilter,igstFilter,sgstTypeFilter,cgstTypeFilter)   // setValue("gstType.label", apiData.gstType);
+      setValue("totalAmountGst", apiData.totalAmountGst);
+      }
+     catch (error: any) {
       console.log(error);
     }
   };
@@ -262,7 +294,6 @@ function form() {
       ),
     })
     .required();
-  const [formData, setFormData] = useState<CustomerModel>(defaultValues);
   const {
     register,
     handleSubmit,
@@ -300,54 +331,46 @@ function form() {
       sgst:data.gstType?.value == 2 ? data.sgst?.value: 0,
       cgst: data.gstType?.value == 2 ? data.cgst?.value: 0,
       billTo : data.billTo?.value,
-      shipTo : data.shipTo?.value
+      billToName : data.billTo?.label,
+      shipTo : data.shipTo?.value,
+      shipToName : data.shipTo?.label,
     };
     try {
-      const payload = {
-        data: payloadWithGst
-      };
-      // console.log("Payload-------->", payload);
-      // console.log(customer);
+      const payload = payloadWithGst;
       const response = await axios.post(
-        "/api/invoice/saveinvoice",
+        "/api/invoice/saveInvoice",
         payload
       );
       console.log("Save sucess", response.data);
+      const obj: any = formValues.itemList;
+      const invoiceId = response.data.id;
+      const updatedData = obj.map((item: any) => ({ ...item, invoiceId }));
+      console.log("Update After Edit",updatedData);
+      const payload2 = updatedData;
+    // if(invoiceId){
+      try {
+        const response = await axios.post(
+          "/api/invoice/saveInvoiceMaterial",
+          payload2
+        );
+        console.log("Save sucess", response.data);
+        
+  
+        toast.success("Save success");
+        // router.push("/invoice");
+      } catch (error: any) {
+        toast.error(error.message);
+      }
+    // }
+
+
       toast.success("Save success");
       router.push("/invoice");
     } catch (error: any) {
       toast.error(error.message);
     }
   };
-  const country1 = { label: "Bangladesh", value: 1 };
 
-  const onSaveEdit = async () => {
-    try {
-      const { itemList, ...payloadnew } = formValues;
-
-      console.log("New OBJ", payloadnew);
-      const payload = {
-        data: {
-          invoicename: invoice,
-
-          array: {
-            ...formValues,
-          },
-        },
-      };
-      console.log("Payload-------->", payload);
-      // console.log(customer);
-      // const response = await axios.post(
-      //   "/api/customers/savecustomer",
-      //   customer
-      // );
-      // console.log("Save sucess", response.data);
-      // toast.success("Save success");
-      // router.push("/customer");
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
   const subTotalCal = (discount: any, quantity: any, price: any) => {
     const total = (quantity * price * (100 - discount)) / 100;
     setTimeout(() => {
@@ -374,14 +397,10 @@ function form() {
       parseFloat(freight ? freight : formValues?.freight || 0) +
       totalSubTotal;
     setValue("totalAmount", parseInt(total));
-    // setValue("GSTValue", formValues.igst?.value);
 
-    console.log("TotalCall", total);
-    console.log("GSTValue", igst, sgst);
     if (formValues.gstType?.value == 1) {
       const gstPer =
         1 + parseFloat(igst ? igst : formValues.igst?.value || "") / 100;
-      // console.log("gst%", gstPer);
       const TotalWithGST: any = total * gstPer;
       setValue("totalAmountGst", parseInt(TotalWithGST));
     }
@@ -393,8 +412,9 @@ function form() {
       const TotalWithGST: any = total * gstPer;
       setValue("totalAmountGst", parseInt(TotalWithGST));
     }
-  };
-  return (
+  };  
+  console.log("formValues",formValues)
+  return (  
     <>
       <div>
         <h1 className="block uppercase tracking-wide text-center text-gray-700 font-bold mb-8 text-3xl">
@@ -415,6 +435,7 @@ function form() {
                 className="text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
                 id="grid-first-name"
                 type="text"
+                value = {formValues.invoiceNo}
                 placeholder="Enter Invoice Number"
                 onChange={(e) => {
                   setValue("invoiceNo", parseInt(e.target.value));
@@ -433,7 +454,7 @@ function form() {
               <input
                 className="text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
                 type="date"
-                {...register("Date")}
+                {...register("date")}
                 placeholder="Enter Date"
               />
             </div>
@@ -614,7 +635,6 @@ function form() {
                         id="grid-first-name"
                         type="text"
                         placeholder="Discount"
-                        // {...register(`itemList.${index}.discount`)}
                         onChange={(e) => {
                           setValue(
                             `itemList.${index}.discount`,
@@ -634,7 +654,6 @@ function form() {
                               shouldValidate: true,
                             }
                           );
-                          // subTotalCal(e.target.value, formValues.itemList?.[index]?.qty, formValues.itemList?.[index]?.unitPrice)
                         }}
                       />
                     </td>
@@ -643,11 +662,7 @@ function form() {
                         className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
                         id="grid-first-name"
                         type="text"
-                        // disabled={true}
                         placeholder="Total"
-                        // onChange={(e) => {
-                        //   console.log(e)
-                        // }}
                         value={formValues?.itemList?.[index].subTotal}
                         {...register(`itemList.${index}.subTotal`)}
                       />
@@ -657,7 +672,6 @@ function form() {
                       <FaPlus
                         onClick={() =>
                           append({
-                            _id: "",
                             description: "",
                             qty: 0,
                             unit: "",
@@ -666,7 +680,7 @@ function form() {
                             subTotal: 0,
                           })
                         }
-                      />
+                      /> 
                     </td>
                   </tr>
                 ))}
@@ -682,6 +696,7 @@ function form() {
                 Laboar Charges
               </label>
               <input
+                value={formValues.labourCharge}
                 className="w-100 text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
                 id="grid-city"
                 type="number"
@@ -702,6 +717,7 @@ function form() {
                 Freight
               </label>
               <input
+                value={formValues.freight}
                 className="w-100 text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
                 id="grid-zip"
                 type="number"
@@ -727,16 +743,7 @@ function form() {
                 isSearchable={true}
                 name="supervisorId"
                 value={formValues?.gstType}
-                options={[
-                  {
-                    label: "IGST",
-                    value: 1,
-                  },
-                  {
-                    label: "CGST/SGST",
-                    value: 2,
-                  },
-                ]}
+                options={gstType}
                 onChange={(selected: any) => {
                   setValue("gstType.label", selected.label, {
                     shouldValidate: true,
@@ -863,21 +870,18 @@ function form() {
           </div>
           <div className="flex items-center justify-center">
             <button
-              // onClick={onSaveEdit}
               type="submit"
-              // buttonClassNames="saveButton"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4"
             >
               {"Submit"}
             </button>
             <button
-              onClick={() => router.push("/customer")}
+              onClick={() => router.push("/invoice")}
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-4"
             >
               {"Cancel"}
             </button>
             <button
-              // onClick={() => router.push("/invoice/template")}
               onClick={() => downloadPDF()}
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-4"
             >

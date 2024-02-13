@@ -1,7 +1,7 @@
 import { getDataFromToken } from "@/helpers/getdataFromToken";
 import { NextRequest,NextResponse } from "next/server";
 import { connect } from "@/dbConfig/dbConfig";
-import Customer from "@/models/customerModel";
+import Invoice from "@/models/invoiceModel";
 
 
 connect();
@@ -10,7 +10,7 @@ export async function POST(request: NextRequest){
         
         const reqBody = await request.json();
         console.log("object",reqBody)
-        const customer = await Customer.findOne({_id:reqBody.id})
+        const customer = await Invoice.findOne({_id:reqBody.id})
 
         if(!customer){
             return NextResponse.json({
