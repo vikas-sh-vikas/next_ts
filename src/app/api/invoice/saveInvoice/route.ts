@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       const invoice = await Invoice.create({_id,invoiceNo, date, labourCharge, freight, totalAmount,totalAmountGst, gstType,igst,cgst,sgst,shipTo,shipToName,billTo,billToName})
       console.log("Invoice Reach Add",invoice)
       
-
+      
       return NextResponse.json({
         message: "Invoice saved",
         id: invoice._id,

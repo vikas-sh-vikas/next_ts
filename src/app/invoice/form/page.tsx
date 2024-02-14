@@ -13,7 +13,7 @@ import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.css";
 
 type CustomerModel = {
-  invoiceNo: number;
+  invoiceNo?: number;
   date?: string;
   shipTo?: {
     label?: string;
@@ -31,15 +31,15 @@ type CustomerModel = {
   };
   igst?: {
     label?: string;
-    value?:  number | undefined;
+    value?: number | undefined;
   };
   sgst?: {
     label?: string;
-    value?:  number | undefined;
+    value?: number | undefined;
   };
   cgst?: {
     label?: string;
-    value?:  number | undefined;
+    value?: number | undefined;
   };
   totalAmount?: number;
   totalAmountGst?: number;
@@ -58,7 +58,7 @@ function form() {
   const router = useRouter();
   const [selectOptionShip, setSelectOptionShip] = useState([{}]);
   const defaultValues: CustomerModel = {
-    invoiceNo: 0,
+    // invoiceNo: 0,
     date: "",
     labourCharge: 0,
     freight: 0,
@@ -76,7 +76,6 @@ function form() {
     ],
   };
   const [formData, setFormData] = useState<CustomerModel>(defaultValues);
-
 
   const urlparams = new URLSearchParams(location.search);
   const id = urlparams.get("id");
@@ -222,34 +221,49 @@ function form() {
     // }
     try {
       const response = await axios.post(`/api/invoice/getInvoiceById`, data);
-      const apiData:any= response.data.data;
-      console.log("Invoice Number in Edit",apiData)
+      const apiData: any = response.data.data;
+      console.log("Invoice Number in Edit", apiData);
       // setValue("invoiceNo",apiData.invoiceNo);;
-      setValue("invoiceNo", apiData.invoiceNo);
-      setValue("date", apiData.date);
-      setValue("labourCharge", apiData.labourCharge);
-      setValue("freight", apiData.freight);
-      // ... set other fields as needed
-      // Set shipTo and billTo
-      setValue("shipTo.label", apiData.shipToName);
-      setValue("shipTo.value", apiData.shipTo);
-      setValue("billTo.label", apiData.billToName);
-      setValue("billTo.value", apiData.billTo);
-      setValue("totalAmount", apiData.totalAmount);
-      const gstTypeFilter:any = gstType.filter((gstType) => gstType.value === apiData.gstType);   
-      const igstFilter:any = gstOptions.filter((gstType) => gstType.value === apiData.igst);   
-      const sgstTypeFilter:any = sgstOptions.filter((gstType) => gstType.value === apiData.sgst);   
-      const cgstTypeFilter:any = sgstOptions.filter((gstType) => gstType.value === apiData.cgst);   
-      setValue("gstType.value",gstTypeFilter[0].value);
-      setValue("gstType.label",gstTypeFilter[0].label);
-      setValue("igst",igstFilter);
-      setValue("cgst",sgstTypeFilter);
-      setValue("sgst",cgstTypeFilter);
-      
-      // console.log("gstType",gstTypeFilter,igstFilter,sgstTypeFilter,cgstTypeFilter)   // setValue("gstType.label", apiData.gstType);
-      setValue("totalAmountGst", apiData.totalAmountGst);
+      const gstTypeFilter: any = gstType.filter(
+        (gstType) => gstType.value === apiData.gstType
+      );
+      const igstFilter: any = gstOptions.filter(
+        (gstType) => gstType.value === apiData.igst
+      );
+      const sgstTypeFilter: any = sgstOptions.filter(
+        (gstType) => gstType.value === apiData.sgst
+      );
+      const cgstTypeFilter: any = sgstOptions.filter(
+        (gstType) => gstType.value === apiData.cgst
+      );
+      reset({
+        ...apiData,
+        shipTo: { label: apiData.shipToName, value: apiData.shipTo },
+        billTo: { label: apiData.shipToName, value: apiData.shipTo },
+        gstType: {
+          label: gstTypeFilter[0].label,
+          value: gstTypeFilter[0].value,
+        },
+        igst: igstFilter,
+        cgst: sgstTypeFilter,
+        sgst: cgstTypeFilter,
+      });
+      try {
+        const response = await axios.post(
+          `/api/invoice/getInvoiceMaterialById`,
+          data
+        );
+        const apiData: any = response.data.data;
+        console.log("DataMaterial", apiData);
+        setValue("itemList",apiData)
+        // reset({
+        //   ...formValues, // keep existing form data
+        //   itemList: apiData, // update itemList with new data
+        // });
+      } catch (error: any) {
+        console.log(error);
       }
-     catch (error: any) {
+    } catch (error: any) {
       console.log(error);
     }
   };
@@ -326,43 +340,39 @@ function form() {
     } = data;
     const payloadWithGst = {
       ...formvaluesFilter,
+      // id ? _id : id,
       gstType: data.gstType?.value,
       igst: data.gstType?.value == 1 ? data.igst?.value : 0,
-      sgst:data.gstType?.value == 2 ? data.sgst?.value: 0,
-      cgst: data.gstType?.value == 2 ? data.cgst?.value: 0,
-      billTo : data.billTo?.value,
-      billToName : data.billTo?.label,
-      shipTo : data.shipTo?.value,
-      shipToName : data.shipTo?.label,
+      sgst: data.gstType?.value == 2 ? data.sgst?.value : 0,
+      cgst: data.gstType?.value == 2 ? data.cgst?.value : 0,
+      billTo: data.billTo?.value,
+      billToName: data.billTo?.label,
+      shipTo: data.shipTo?.value,
+      shipToName: data.shipTo?.label,
     };
     try {
       const payload = payloadWithGst;
-      const response = await axios.post(
-        "/api/invoice/saveInvoice",
-        payload
-      );
+      const response = await axios.post("/api/invoice/saveInvoice", payload);
       console.log("Save sucess", response.data);
       const obj: any = formValues.itemList;
       const invoiceId = response.data.id;
       const updatedData = obj.map((item: any) => ({ ...item, invoiceId }));
-      console.log("Update After Edit",updatedData);
+      console.log("Update After Edit", updatedData);
       const payload2 = updatedData;
-    // if(invoiceId){
+      // if(invoiceId){
       try {
         const response = await axios.post(
           "/api/invoice/saveInvoiceMaterial",
           payload2
         );
         console.log("Save sucess", response.data);
-        
-  
+
         toast.success("Save success");
         // router.push("/invoice");
       } catch (error: any) {
         toast.error(error.message);
       }
-    // }
-
+      // }
 
       toast.success("Save success");
       router.push("/invoice");
@@ -412,9 +422,9 @@ function form() {
       const TotalWithGST: any = total * gstPer;
       setValue("totalAmountGst", parseInt(TotalWithGST));
     }
-  };  
-  console.log("formValues",formValues)
-  return (  
+  };
+  console.log("formValues", formValues);
+  return (
     <>
       <div>
         <h1 className="block uppercase tracking-wide text-center text-gray-700 font-bold mb-8 text-3xl">
@@ -435,7 +445,7 @@ function form() {
                 className="text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
                 id="grid-first-name"
                 type="text"
-                value = {formValues.invoiceNo}
+                value={formValues.invoiceNo}
                 placeholder="Enter Invoice Number"
                 onChange={(e) => {
                   setValue("invoiceNo", parseInt(e.target.value));
@@ -555,17 +565,39 @@ function form() {
                       <input
                         className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
                         type="text"
-                        {...register(`itemList.${index}.description`)}
+                        value={formValues.itemList?.[index]?.description}
+                        onChange={(e) => {
+                          setValue(
+                          `itemList.${index}.description`,
+                          e.target.value,
+                          {
+                            shouldValidate: true,
+                          })
+                        }}
+                        // onChange={(e) => {
+                        //   setValue(`itemList.${index}.description`,e.target.value)
+                        // }}
+                        //onClick={setValue(`itemList.${index}.description`,"")}
+                        // {...register(`itemList.${index}.description`)}
                         placeholder="Enter Description"
                       />
                     </td>
                     <td>
                       <input
+                        value={formValues.itemList?.[index]?.unit}
+                        onChange={(e) => {
+                          setValue(
+                          `itemList.${index}.unit`,
+                          e.target.value,
+                          {
+                            shouldValidate: true,
+                          })
+                        }}
                         className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
                         id="grid-first-name"
                         type="text"
                         placeholder="Enter Unit"
-                        {...register(`itemList.${index}.unit`)}
+                        //{...register(`itemList.${index}.unit`)}
                       />
                     </td>
                     <td>
@@ -574,6 +606,7 @@ function form() {
                         id="grid-first-name"
                         type="text"
                         placeholder="Enter Quantity"
+                        value={formValues.itemList?.[index]?.qty}
                         // {...register(`itemList.${index}.qty`)}
                         onChange={(e) => {
                           setValue(
@@ -604,6 +637,8 @@ function form() {
                         id="grid-first-name"
                         type="text"
                         placeholder="Enter Unit Price"
+                        value={formValues.itemList?.[index]?.unitPrice}
+
                         // {...register(`itemList.${index}.unitPrice`)}
                         onChange={(e) => {
                           setValue(
@@ -635,6 +670,8 @@ function form() {
                         id="grid-first-name"
                         type="text"
                         placeholder="Discount"
+                        value={formValues.itemList?.[index]?.discount}
+
                         onChange={(e) => {
                           setValue(
                             `itemList.${index}.discount`,
@@ -680,7 +717,7 @@ function form() {
                             subTotal: 0,
                           })
                         }
-                      /> 
+                      />
                     </td>
                   </tr>
                 ))}
@@ -791,7 +828,7 @@ function form() {
                     value={formValues?.cgst}
                     options={sgstOptions}
                     onChange={(selected: any) => {
-                      setValue("cgst.label", (selected.label), {
+                      setValue("cgst.label", selected.label, {
                         shouldValidate: true,
                       });
                       totalCal(0, 0, 0, selected.value);
@@ -876,12 +913,14 @@ function form() {
               {"Submit"}
             </button>
             <button
+              type="button"
               onClick={() => router.push("/invoice")}
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-4"
             >
               {"Cancel"}
             </button>
             <button
+            type="button"
               onClick={() => downloadPDF()}
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-4"
             >

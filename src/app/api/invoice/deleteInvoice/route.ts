@@ -1,5 +1,6 @@
 import { connect } from "@/dbConfig/dbConfig";
 import Invoice from "@/models/invoiceModel";
+import InvoiceMaterial from "@/models/invoiceMaterialModel";
 import { NextRequest, NextResponse } from "next/server";
 
 connect();  
@@ -10,10 +11,11 @@ export async function POST(request: NextRequest) {
     console.log("Delete", reqBody.id);
     
     const invoice = await Invoice.findOneAndDelete({ _id: reqBody.id });
+    //const invoiceMaterial = await InvoiceMaterial.findOneAndDelete({ invoiceNo: reqBody.id });
     
     console.log("Delete", invoice);
     if (!invoice) {
-      return NextResponse.json({ error: "Invoice not found" }, { status: 400 });
+      return NextResponse.json({ error: "Invoice not found or Materials Not Found" }, { status: 400 });
     }
     // const customer = await Customer.create({  reqBody})
     // console.log("Customer Reach Add",customer)
