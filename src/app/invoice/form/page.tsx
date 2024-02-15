@@ -222,7 +222,7 @@ function form() {
     try {
       const response = await axios.post(`/api/invoice/getInvoiceById`, data);
       const apiData: any = response.data.data;
-      console.log("Invoice Number in Edit", apiData);
+      // console.log("Invoice Number in Edit", apiData);
       // setValue("invoiceNo",apiData.invoiceNo);;
       const gstTypeFilter: any = gstType.filter(
         (gstType) => gstType.value === apiData.gstType
@@ -236,6 +236,7 @@ function form() {
       const cgstTypeFilter: any = sgstOptions.filter(
         (gstType) => gstType.value === apiData.cgst
       );
+      console.log("igstType ----- > ", sgstTypeFilter);
       reset({
         ...apiData,
         shipTo: { label: apiData.shipToName, value: apiData.shipTo },
@@ -244,9 +245,25 @@ function form() {
           label: gstTypeFilter[0].label,
           value: gstTypeFilter[0].value,
         },
-        igst: igstFilter,
-        cgst: sgstTypeFilter,
-        sgst: cgstTypeFilter,
+        igst:
+          apiData.gstType == 1
+            ? {
+                label: igstFilter[0].label,
+                value: igstFilter[0].value,
+              }
+            : igstFilter,
+        cgst: 
+        apiData.gstType == 2 ?
+        {
+          label: sgstTypeFilter[0].label,
+          value: sgstTypeFilter[0].value,
+        } : cgstTypeFilter,
+        sgst: 
+        apiData.gstType == 2 ?
+        {
+          label: cgstTypeFilter[0].label,
+          value: cgstTypeFilter[0].value,
+        } : sgstTypeFilter,
       });
       try {
         const response = await axios.post(
@@ -254,8 +271,8 @@ function form() {
           data
         );
         const apiData: any = response.data.data;
-        console.log("DataMaterial", apiData);
-        setValue("itemList",apiData)
+        // console.log("DataMaterial", apiData);
+        setValue("itemList", apiData);
         // reset({
         //   ...formValues, // keep existing form data
         //   itemList: apiData, // update itemList with new data
@@ -353,13 +370,14 @@ function form() {
     try {
       const payload = payloadWithGst;
       const response = await axios.post("/api/invoice/saveInvoice", payload);
-      console.log("Save sucess", response.data);
+      // console.log("Save sucess", response.data);
       const obj: any = formValues.itemList;
       const invoiceId = response.data.id;
       const updatedData = obj.map((item: any) => ({ ...item, invoiceId }));
       console.log("Update After Edit", updatedData);
       const payload2 = updatedData;
       // if(invoiceId){
+
       try {
         const response = await axios.post(
           "/api/invoice/saveInvoiceMaterial",
@@ -374,7 +392,7 @@ function form() {
       }
       // }
 
-      toast.success("Save success");
+      // toast.success("Save success");
       router.push("/invoice");
     } catch (error: any) {
       toast.error(error.message);
@@ -407,7 +425,6 @@ function form() {
       parseFloat(freight ? freight : formValues?.freight || 0) +
       totalSubTotal;
     setValue("totalAmount", parseInt(total));
-
     if (formValues.gstType?.value == 1) {
       const gstPer =
         1 + parseFloat(igst ? igst : formValues.igst?.value || "") / 100;
@@ -415,6 +432,7 @@ function form() {
       setValue("totalAmountGst", parseInt(TotalWithGST));
     }
     if (formValues.gstType?.value == 2) {
+      console.log("Reach in cgst", formValues.cgst?.value);
       const gstPer =
         1 +
         parseFloat(sgst ? sgst : formValues.cgst?.value || "") / 100 +
@@ -568,17 +586,13 @@ function form() {
                         value={formValues.itemList?.[index]?.description}
                         onChange={(e) => {
                           setValue(
-                          `itemList.${index}.description`,
-                          e.target.value,
-                          {
-                            shouldValidate: true,
-                          })
+                            `itemList.${index}.description`,
+                            e.target.value,
+                            {
+                              shouldValidate: true,
+                            }
+                          );
                         }}
-                        // onChange={(e) => {
-                        //   setValue(`itemList.${index}.description`,e.target.value)
-                        // }}
-                        //onClick={setValue(`itemList.${index}.description`,"")}
-                        // {...register(`itemList.${index}.description`)}
                         placeholder="Enter Description"
                       />
                     </td>
@@ -586,12 +600,9 @@ function form() {
                       <input
                         value={formValues.itemList?.[index]?.unit}
                         onChange={(e) => {
-                          setValue(
-                          `itemList.${index}.unit`,
-                          e.target.value,
-                          {
+                          setValue(`itemList.${index}.unit`, e.target.value, {
                             shouldValidate: true,
-                          })
+                          });
                         }}
                         className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"
                         id="grid-first-name"
@@ -606,8 +617,7 @@ function form() {
                         id="grid-first-name"
                         type="text"
                         placeholder="Enter Quantity"
-                        value={formValues.itemList?.[index]?.qty}
-                        // {...register(`itemList.${index}.qty`)}
+                        value={formValues.itemList?.[index]?.qty || ""}
                         onChange={(e) => {
                           setValue(
                             `itemList.${index}.subTotal`,
@@ -637,8 +647,7 @@ function form() {
                         id="grid-first-name"
                         type="text"
                         placeholder="Enter Unit Price"
-                        value={formValues.itemList?.[index]?.unitPrice}
-
+                        value={formValues.itemList?.[index]?.unitPrice || ""}
                         // {...register(`itemList.${index}.unitPrice`)}
                         onChange={(e) => {
                           setValue(
@@ -670,8 +679,7 @@ function form() {
                         id="grid-first-name"
                         type="text"
                         placeholder="Discount"
-                        value={formValues.itemList?.[index]?.discount}
-
+                        value={formValues.itemList?.[index]?.discount || ""}
                         onChange={(e) => {
                           setValue(
                             `itemList.${index}.discount`,
@@ -700,7 +708,7 @@ function form() {
                         id="grid-first-name"
                         type="text"
                         placeholder="Total"
-                        value={formValues?.itemList?.[index].subTotal}
+                        value={formValues?.itemList?.[index].subTotal || ""}
                         {...register(`itemList.${index}.subTotal`)}
                       />
                     </td>
@@ -920,7 +928,7 @@ function form() {
               {"Cancel"}
             </button>
             <button
-            type="button"
+              type="button"
               onClick={() => downloadPDF()}
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-4"
             >

@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         message: "Invoice Updated",
+        id: invoice._id,
         success: true
       });
     }
