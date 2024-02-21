@@ -14,10 +14,10 @@ export function middleware(request: NextRequest) {
   } 
   if(commonPath && token)
   {
-    return NextResponse.redirect(new URL("/profile", request.nextUrl));
+    return NextResponse.redirect(new URL("/dashboard/profile", request.nextUrl));
   } 
   if (isPublic && token) {
-    return NextResponse.redirect(new URL("/profile", request.nextUrl));
+    return NextResponse.redirect(new URL("/dashboard/profile", request.nextUrl));
   }
   if (!isPublic && !token) {
     return NextResponse.redirect(new URL("/login", request.nextUrl));
@@ -26,5 +26,5 @@ export function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ["/", "/profile", "/login", "/signup","/verifyemail","/applications"],
+  matcher: ["/", "/dashboard/profile", "/login", "/signup","/verifyemail"],
 };

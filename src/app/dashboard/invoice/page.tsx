@@ -40,6 +40,8 @@ function index() {
     console.log("TotalNumberofPages", TotalNoofPages)
     setTotalRows(TotalNoofPages)
   };
+  // document.cookie = "username=John Doe";
+  
   // console.log("Data", data);
   const editFunction = async (id: string) => {
     console.log("Clicked edit", id);

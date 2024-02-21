@@ -252,18 +252,20 @@ function form() {
                 value: igstFilter[0].value,
               }
             : igstFilter,
-        cgst: 
-        apiData.gstType == 2 ?
-        {
-          label: sgstTypeFilter[0].label,
-          value: sgstTypeFilter[0].value,
-        } : cgstTypeFilter,
-        sgst: 
-        apiData.gstType == 2 ?
-        {
-          label: cgstTypeFilter[0].label,
-          value: cgstTypeFilter[0].value,
-        } : sgstTypeFilter,
+        cgst:
+          apiData.gstType == 2
+            ? {
+                label: sgstTypeFilter[0].label,
+                value: sgstTypeFilter[0].value,
+              }
+            : cgstTypeFilter,
+        sgst:
+          apiData.gstType == 2
+            ? {
+                label: cgstTypeFilter[0].label,
+                value: cgstTypeFilter[0].value,
+              }
+            : sgstTypeFilter,
       });
       try {
         const response = await axios.post(
@@ -619,11 +621,18 @@ function form() {
                         placeholder="Enter Quantity"
                         value={formValues.itemList?.[index]?.qty || ""}
                         onChange={(e) => {
+                          // Parse the entered value as an integer
+                          const enteredQty = parseInt(e.target.value);
+
+                          // Limit the value to 100
+                          const limitedQty =
+                            enteredQty > 100 ? 100 : enteredQty;
+                          console.log("Value")
                           setValue(
                             `itemList.${index}.subTotal`,
                             subTotalCal(
                               formValues.itemList?.[index]?.discount,
-                              e.target.value,
+                              limitedQty,
                               formValues.itemList?.[index]?.unitPrice
                             ),
                             {
@@ -632,7 +641,7 @@ function form() {
                           );
                           setValue(
                             `itemList.${index}.qty`,
-                            parseInt(e.target.value),
+                            limitedQty,
                             {
                               shouldValidate: true,
                             }
@@ -640,7 +649,6 @@ function form() {
                         }}
                       />
                     </td>
-
                     <td>
                       <input
                         className="w-100 text-gray-700 border-0 rounded py-2 px-2 mb-3 focus:outline-none"

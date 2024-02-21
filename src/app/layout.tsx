@@ -5,8 +5,8 @@ import './globals.css'
 // import Header from '@/app/header/page'
 import { Toaster } from 'react-hot-toast'
 import { ReduxProvider } from '@/redux/providers'
-import Header from '../components/header/header'
-import { useAppSelector } from '@/redux/store'
+// import Header from '../components/header/header'
+// import { useAppSelector } from '@/redux/store'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -26,7 +26,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-gray-50 text-black">
       <ReduxProvider>
-        <Header />
+        {/* <Header /> */}
         <Toaster position="bottom-center" />
         {children}</ReduxProvider>
       </body>
