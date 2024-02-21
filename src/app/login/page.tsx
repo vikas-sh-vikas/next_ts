@@ -8,7 +8,8 @@ import toast from "react-hot-toast";
 import Forgetpassword from "../forgetpassword/page";
 import { logOut, logIn } from "@/redux/features/auth-slice";
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/redux/store";
+// import { AppDispatch } from "@/redux/store";
+import { Spin, Switch } from 'antd';
 
 type LoginModel = {
   email: string;
@@ -72,11 +73,13 @@ function Login() {
   }, [user]);
   return (
     <div className="min-h-screen bg-indigo-500 flex flex-col items-center justify-center py-2">
-      <div className="flex flex-col bg-white items-center justify-center w-max p-10 rounded-3xl shadow-3xl">
-        <h1 className="p-8 text-6xl font-family: Menlo font-bold text-Indigo">
-          {loading ? "Loading..." : reset ? "RESET" : "LOGIN"}
+      <Spin spinning={loading} size="large">
+
+      <div className="flex flex-col bg-gray-50 items-center justify-center w-max p-20 rounded-3xl shadow-3xl">
+        <h1 className="p-8 text-6xl font-family: Menlo font-semibold text-gray-600">
+          {reset ? "RESET" : "LOGIN"}
         </h1>
-        <label className="p-2" htmlFor="email">
+        <label className="p-2 text-gray-800" htmlFor="email">
           Email
         </label>
         <div className="relative mb-6">
@@ -103,7 +106,7 @@ function Login() {
         </div>
         {!reset ? (
           <>
-            <label className="p-2 " htmlFor="password">
+            <label className="p-2 text-gray-800" htmlFor="password">
               Password
             </label>
             <input
@@ -116,7 +119,7 @@ function Login() {
             />
             <Link
               onClick={() => setReset(true)}
-              className="text-slate-900 justify-start text-xs mb-4"
+              className="text-slate-900 justify-start text-xs text-gray-600 mb-4"
               href={""}
             >
               forget password or reset password
@@ -126,7 +129,7 @@ function Login() {
           <Link
             href={""}
             onClick={() => setReset(false)}
-            className="text-slate-900 justify-start text-xs mb-4"
+            className="text-slate-900 justify-start text-xs text-gray-600 mb-4"
           >
             Login with password
           </Link>
@@ -134,14 +137,17 @@ function Login() {
 
         <button
           onClick={onLogin}
-          className="bg-indigo-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4"
+          className="transition duration-150 ease-in-out bg-indigo-500  text-white font-bold py-2 px-4 rounded m-4"
         >
+          {/* <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+            </svg> */}
           {reset ? "Reset" : "Log In"}
         </button>
-        <Link className="text-slate-900" href="/signup">
+        <Link className="text-gray-600" href="/signup">
           Visit sign up page
         </Link>
       </div>
+      </Spin>
     </div>
   );
 }

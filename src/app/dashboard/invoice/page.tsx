@@ -45,7 +45,7 @@ function index() {
   // console.log("Data", data);
   const editFunction = async (id: string) => {
     console.log("Clicked edit", id);
-    router.push("/invoice/form?id=" + id);
+    router.push("/dashboard/invoice/form?id=" + id);
   };
   const deleteFunction = async (id: string, customerName: string) => {
     const data = {
@@ -69,7 +69,7 @@ function index() {
     }
   };
   const onAddClick = async () => {
-    router.push("/invoice/form");
+    router.push("/dashboard/invoice/form");
   };
   return (
     <div>

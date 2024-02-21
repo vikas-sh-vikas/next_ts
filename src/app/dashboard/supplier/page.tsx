@@ -37,7 +37,7 @@ function index(searchParams: any) {
   console.log("SearchParamas", searchParams);
   const editFunction = async (id: string) => {
     console.log("Clicked edit", id);
-    router.push("/supplier/form?id=" + id);
+    router.push("/dashboard/supplier/form?id=" + id);
   };
   const deleteFunction = async (id: string, customerName: string) => {
     const data = {
@@ -63,7 +63,7 @@ function index(searchParams: any) {
     }
   };
   const onAddClick = async () => {
-    router.push("/supplier/form");
+    router.push("/dashboard/supplier/form");
   };
   return (
     <div>

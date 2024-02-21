@@ -395,7 +395,7 @@ function form() {
       // }
 
       // toast.success("Save success");
-      router.push("/invoice");
+      router.push("/dashboard/invoice");
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -930,7 +930,7 @@ function form() {
             </button>
             <button
               type="button"
-              onClick={() => router.push("/invoice")}
+              onClick={() => router.push("/dashboard/invoice")}
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-4"
             >
               {"Cancel"}

@@ -59,7 +59,7 @@ function form() {
       );
       console.log("Save sucess", response.data);
       toast.success("Save success");
-      router.push("/supplier");
+      router.push("/dashboard/supplier");
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -181,7 +181,7 @@ function form() {
             {"Submit"}
           </button>
           <button
-            onClick={() => router.push("/supplier")}
+            onClick={() => router.push("/dashboard/supplier")}
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-4"
           >
             {"Cancel"}
