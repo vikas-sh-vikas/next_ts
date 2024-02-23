@@ -1,81 +1,129 @@
 "use client";
 
-import Header from "@/components/header/header";
 import axios from "axios";
-import { set } from "mongoose";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import Select from "react-select";
+import { Option } from "antd/es/mentions";
 
+type Option = {
+  label:string;
+  value:string;
+}[]
 type CustomerModel = {
-  _id: string;
   customerName: string;
   gstNo: string;
-  address: string;
+  partyType: string;
+  country: string;
+  state: string;
+  district: string;
+  street: string;
+  pincode?: string;
   contactPerson: string;
-  contactDetail: string;
+  contactDetail?: string;
 };
 
 function form() {
   const router = useRouter();
+  const [countryOptions, setCountryOption] = useState<Option>([
+      {"label": "Afghanistan", "value": "AF"},
+      {"label": "Albania", "value": "AL"},
+      {"label": "Algeria", "value": "DZ"},
+      {"label": "Andorra", "value": "AD"},
+      {"label": "Angola", "value": "AO"}
+  ])
+  const [selectCountry, setSelectCountry] = useState<Option>()
 
   const defaultValues: CustomerModel = {
-    _id: "",
     customerName: "",
     gstNo: "",
-    address: "",
-    contactPerson: "",
-    contactDetail: "",
+    partyType: "",
+    country: "",
+    state: "",
+    district: "",
+    street: "",
+    contactPerson: ""
   };
+
+  const validationSchema = yup.object({
+    customerName: yup.string().required("customerName is required"),
+    gstNo: yup.string().required("gstNo is required"),
+    partyType: yup.string().required("partyType is required"),
+    country: yup.string().required("country is required"),
+    state: yup.string().required("state is required"),
+    district: yup.string().required("district is required"),
+    street: yup.string().required("street is required"),
+    // contactDetail: yup.string().required("contactDetail is required"),
+    contactPerson: yup.string().required("contactPerson is required"),
+  });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    getValues,
+    control,
+    formState: { errors, isSubmitting },
+  } = useForm<CustomerModel>({
+    mode: "all",
+    defaultValues,
+    resolver: yupResolver(validationSchema),
+  });
+  const formValues = getValues();
+
   const urlparams = new URLSearchParams(location.search);
   const id = urlparams.get("id");
-  const [customer, setCustomer] = useState<CustomerModel>(defaultValues);
   useEffect(() => {
-        getCustomerDetailByid()
+    getCustomerDetailByid();
   }, [id]);
   const getCustomerDetailByid = async () => {
     // if(id){
     const data = {
       id: id,
-    }
+    };
     // }
     try {
-      const response = await axios.post(
-        `/api/customers/getCustomerById`,data
-      );
+      const response = await axios.post(`/api/customers/getCustomerById`, data);
       const apiData = response.data.data;
-      console.log(apiData)
-      setCustomer({ ...apiData})
+      // console.log("EditData",apiData.country);
+      const select = countryOptions.filter(person => person.value == apiData.country); 
+      // console.log("FilterData",olderThan25);
+      setSelectCountry(select);
+      reset({
+        ...apiData,
+      });
+      // setCustomer({ ...apiData });
     } catch (error: any) {
       console.log(error);
     }
-  }
-  const onSaveEdit = async () => {
+  };
+  const onSubmit: SubmitHandler<CustomerModel> = async (data) => {
     try {
-      console.log(customer);
-      const response = await axios.post(
-        "/api/customers/savecustomer",
-        customer
-      );
+      console.log("Data",data)
+      const response = await axios.post("/api/customers/savecustomer", data);
       console.log("Save sucess", response.data);
       toast.success("Save success");
       router.push("/dashboard/customer");
     } catch (error: any) {
+      console.log("Error", error);
       toast.error(error.message);
     }
   };
-  console.log("customer", customer);
+  console.log("Formvalues",selectCountry)
   return (
     <>
-      <div className="flex flex-col items-center py-2 bg-slate-50">
-        <form className="w-full max-w-lg">
+      <div>
+        <form className="p-6" onSubmit={handleSubmit(onSubmit)}>
           <h1 className="block uppercase tracking-wide text-center text-gray-700 font-bold mb-8 text-3xl">
-            Cunstomer Detail
+            Party Detail
           </h1>
-
-          <hr className="mb-2"></hr>
-          <div className="flex flex-wrap -mx-3 mb-6">
-            <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+          <hr className="mb-4"></hr>
+          <div className="grid grid-cols-3 gap-4 p-4">
+            <div>
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                 htmlFor="grid-first-name"
@@ -83,111 +131,219 @@ function form() {
                 Customer Name
               </label>
               <input
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                id="grid-first-name"
+                className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                id="customerName"
                 type="text"
-                value={customer.customerName}
                 placeholder="Enter Customer Name"
-                onChange={(e) =>
-                  setCustomer({ ...customer, customerName: e.target.value })
-                }
+                {...register("customerName")}
               />
             </div>
-            <div className="w-full md:w-1/2 px-3">
-              <label
-                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                htmlFor="grid-last-name"
-              >
+            <div>
+              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
                 GST No.
               </label>
               <input
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                id="grid-last-name"
-                value={customer.gstNo}
-
+                className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                id="gstNo"
+                {...register("gstNo")}
                 type="text"
                 placeholder="Enter GST No."
-                onChange={(e) =>
-                  setCustomer({ ...customer, gstNo: e.target.value })
-                }
+              />
+            </div>
+            <div>
+              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                Party Type
+              </label>
+              <Select
+                isSearchable={true}
+                name="partyType"
+                // value={formValues?.partyType}
+                options={[
+                  {
+                    value: '1',
+                    label: 'Customer',
+                  },
+                  {
+                    value: '2',
+                    label: 'Supplier',
+                  }
+                ]}
+                onChange={(selected: any) => {
+                  // setValue("partyType", selected.label, {
+                  //   // shouldValidate: true,
+                  // });
+                  setValue("partyType", selected.value, {
+                    // shouldValidate: true,
+                  });
+                }}
               />
             </div>
           </div>
-          <div className="flex flex-wrap -mx-3 mb-6">
-            <div className="w-full px-3">
+          <hr className="mb-4"></hr>
+          {/* <span
+            className=" p-4 block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+          >
+            Address
+          </span> */}
+
+          <div className="grid grid-cols-3 gap-4  p-4">
+            <div>
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                htmlFor="grid-password"
               >
-                Address
+                Country
+              </label>
+              <Select
+                isSearchable={true}
+                name="country"
+                value={selectCountry}
+                options={countryOptions}
+                onChange={(selected: any) => {
+                  setSelectCountry(selected)
+                  // setValue("countryName", selected.label, {
+                  //   // shouldValidate: true,
+                  // });
+                  setValue("country", selected.value, {
+                    // shouldValidate: true,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <label
+                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+              >
+                State
+              </label>
+              <Select
+                isSearchable={true}
+                name="state"
+                // value={formValues?.partyType}
+                options={[
+                  {
+                    value: '1',
+                    label: 'Customer',
+                  },
+                  {
+                    value: '2',
+                    label: 'Supplier',
+                  }
+                ]}
+                onChange={(selected: any) => {
+                  // setValue("state", selected.label, {
+                  //   // shouldValidate: true,
+                  // });
+                  setValue("state", selected.value, {
+                    shouldValidate: true,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <label
+                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+              >
+                District
+              </label>
+              <Select
+                isSearchable={true}
+                name="district"
+                // value={formValues?.partyType}
+                options={[
+                  {
+                    value: '1',
+                    label: 'Customer',
+                  },
+                  {
+                    value: '2',
+                    label: 'Supplier',
+                  }
+                ]}
+                onChange={(selected: any) => {
+                  // setValue("district", selected.label, {
+                  //   // shouldValidate: true,
+                  // });
+                  setValue("district", selected.value, {
+                    // shouldValidate: true,
+                  });
+                }}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4  p-4">
+            <div>
+              <label
+                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+              >
+                Street/Colony
               </label>
               <input
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                id="grid-password"
+                className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                id="address"
                 type="text"
-                value={customer.address}
-
+                {...register("street")}
                 placeholder="Enter Address"
-                onChange={(e) =>
-                  setCustomer({ ...customer, address: e.target.value })
-                }
+              />
+            </div>
+            <div>
+              <label
+                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+              >
+                Pincode
+              </label>
+              <input
+                className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                id="address"
+                type="text"
+                {...register("pincode")}
+                placeholder="Enter Address"
               />
             </div>
           </div>
-          <div className="flex flex-wrap -mx-3 mb-2">
-            <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-              <label
-                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                htmlFor="grid-city"
-              >
+
+          <hr className="mb-4"></hr>
+
+          <div className="grid grid-cols-2 gap-4  p-4">
+            <div>
+              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
                 Contact Person
               </label>
               <input
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                id="grid-city"
+                className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                id="contactPerson"
                 type="text"
-                value={customer.contactPerson}
-
+                {...register("contactPerson")}
                 placeholder="Enter Name"
-                onChange={(e) =>
-                  setCustomer({ ...customer, contactPerson: e.target.value })
-                }
               />
             </div>
-            <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-              <label
-                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                htmlFor="grid-zip"
-              >
+            <div>
+              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
                 Contact Detail
               </label>
               <input
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                id="grid-zip"
+                className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                id="contactDetail"
                 type="text"
-                value={customer.contactDetail}
                 placeholder="Enter Detail"
-                onChange={(e) =>
-                  setCustomer({ ...customer, contactDetail: e.target.value })
-                }
+                {...register("contactDetail")}
               />
             </div>
           </div>
+          <div className="flex items-center justify-center">
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4"
+            >
+              {"Submit"}
+            </button>
+            <button
+              onClick={() => router.push("/dashboard/customer")}
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-4"
+            >
+              {"Cancel"}
+            </button>
+          </div>
         </form>
-        <div className="flex items-center justify-center">
-          <button
-            onClick={onSaveEdit}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4"
-          >
-            {"Submit"}
-          </button>
-          <button
-            onClick={() => router.push("/dashboard/customer")}
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-4"
-          >
-            {"Cancel"}
-          </button>
-        </div>
       </div>
     </>
   );

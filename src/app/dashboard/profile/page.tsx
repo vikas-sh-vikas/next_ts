@@ -11,8 +11,9 @@ export default function Profile() {
   return (
     <div className="grid grid-cols-12">
       <aside
+        style={{height:"90vh"}}
         id="default-sidebar"
-        className="hidden col-span-2 h-screen lg:block h-fit"
+        className="hidden col-span-2 h-screen lg:block"
         aria-label="Sidebar"
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
@@ -152,7 +153,8 @@ export default function Profile() {
           </ul>
         </div>
       </aside>
-      <div className="lg:col-span-10 sm:col-span-12 col-span-12 m-4 grid sm:grid-cols-2 gap-4">
+      <div className="lg:col-span-10 sm:col-span-12 col-span-12 m-4 grid sm:grid-cols-2 gap-4"
+        >
         <div className="min-h-[100px] bg-indigo-500 rounded-lg shadow flex justify-center items-center">
           <h1>Customer</h1>
         </div>

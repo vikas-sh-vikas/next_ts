@@ -11,9 +11,29 @@ const customerSchema = new mongoose.Schema({
         required: [true,"Please provide a gstNo"],
         // unique: true,
     },
-    address:{
+    partyType:{
         type: String,
         required: [true,"Please provide a address"],
+    },
+    country:{
+        type: String,
+        required: [true,"Please provide a address"],
+    },
+    state:{
+        type: String,
+        required: [true,"Please provide a address"],
+    },
+    district:{
+        type: String,
+        required: [true,"Please provide a address"],
+    },
+    street:{
+        type: String,
+        required: [true,"Please provide a address"],
+    },
+    pincode:{
+        type: String,
+        // required: [true,"Please provide a address"],
     },
     contactPerson:{
         type: String,
@@ -21,7 +41,7 @@ const customerSchema = new mongoose.Schema({
     },
     contactDetail:{
         type: String,
-        required: [true,"Please provide a contactDetail"],
+        // required: [true,"Please provide a contactDetail"],
     },
     
 })

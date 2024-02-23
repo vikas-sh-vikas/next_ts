@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     console.log("Reach Save API")
 
     const reqBody = await request.json();
-    const { _id,customerName, gstNo, address, contactPerson, contactDetail } =
+    const { _id,customerName, gstNo, partyType, country, state,district,street,pincode,contactPerson,contactDetail} =
       reqBody;
     //add customer
     if(reqBody._id){
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
     else {
       
-      const customer = await Customer.create({  _id,customerName, gstNo, address, contactPerson, contactDetail})
+      const customer = await Customer.create({  _id,customerName, gstNo, partyType, country, state,district,street,pincode,contactPerson,contactDetail})
       console.log("Customer Reach Add",customer)
       
       return NextResponse.json({
