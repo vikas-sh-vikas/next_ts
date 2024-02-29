@@ -27,7 +27,7 @@ type CustomerModel = {
   contactDetail?: string;
 };
 
-function form() {
+function Form() {
   const router = useRouter();
   const [countryOptions, setCountryOption] = useState<Option>([])
   const [stateOptions, setStateOption] = useState<Option>([
@@ -388,4 +388,4 @@ function form() {
   );
 }
 
-export default form;
+export default Form;

@@ -54,7 +54,7 @@ type CustomerModel = {
   }[];
 };
 
-function form() {
+function Form() {
   const router = useRouter();
   const [selectOptionShip, setSelectOptionShip] = useState([{}]);
   const defaultValues: CustomerModel = {
@@ -949,4 +949,4 @@ function form() {
   );
 }
 
-export default form;
+export default Form;

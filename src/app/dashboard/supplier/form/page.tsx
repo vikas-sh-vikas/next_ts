@@ -16,7 +16,7 @@ type SupplierModel = {
   contactDetail: string;
 };
 
-function form() {
+function Form() {
   const router = useRouter();
 
   const defaultValues: SupplierModel = {
@@ -192,4 +192,4 @@ function form() {
   );
 }
 
-export default form;
+export default Form;
