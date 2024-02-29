@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 // import { useAppSelector } from "@/redux/store";
 import Link from "next/link";
+import { FaUser, FaBox, FaFileInvoice,FaBars } from "react-icons/fa";
 
 export default function Profile() {
   const router = useRouter();
@@ -11,47 +12,20 @@ export default function Profile() {
   return (
     <div className="grid grid-cols-12">
       <aside
-        style={{height:"90vh"}}
+        style={{ height: "90vh" }}
         id="default-sidebar"
         className="hidden col-span-2 h-screen lg:block"
         aria-label="Sidebar"
       >
-        <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+        <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50">
           <ul className="space-y-2 font-medium">
             <li>
-              <Link href={"/dashboard/customer"}
-                className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                >
-                <svg
-                  className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 22 21"
-                >
-                  <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
-                  <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
-                </svg>
-                <span className="ms-3">Customer</span>
-              </Link>
-            </li>
-            <li>
-            <Link href={"/dashboard/supplier"}
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                >
-                <svg
-                  className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 18 18"
-                >
-                  <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z" />
-                </svg>
-                <span className="flex-1 ms-3 whitespace-nowrap">Supplier</span>
-                {/* <span className="inline-flex items-center justify-center px-2 ms-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300">
-                  Pro
-                </span> */}
+              <Link
+                href={"/dashboard/customer"}
+                className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+              >
+                <FaBox className="text-gray-500 transition duration-7 group-hover:text-gray-900 dark:group-hover:text-white"></FaBox>
+                <span className="ms-3">Party/Ledger</span>
               </Link>
             </li>
             <li>
@@ -59,22 +33,13 @@ export default function Profile() {
                 href="/dashboard/invoice"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
-                <svg
-                  className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="m17.418 3.623-.018-.008a6.713 6.713 0 0 0-2.4-.569V2h1a1 1 0 1 0 0-2h-2a1 1 0 0 0-1 1v2H9.89A6.977 6.977 0 0 1 12 8v5h-2V8A5 5 0 1 0 0 8v6a1 1 0 0 0 1 1h8v4a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-4h6a1 1 0 0 0 1-1V8a5 5 0 0 0-2.582-4.377ZM6 12H4a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2Z" />
-                </svg>
-                <span className="flex-1 ms-3 whitespace-nowrap">Invoice</span>
+<FaFileInvoice className="text-gray-500 transition duration-7 group-hover:text-gray-900 dark:group-hover:text-white"></FaFileInvoice>                <span className="flex-1 ms-3 whitespace-nowrap">Invoice</span>
                 {/* <span className="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
                   3
                 </span> */}
-              </Link>
+              </Link>  
             </li>
-            <li>
+            {/* <li>
               <Link
                 href="#"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
@@ -90,21 +55,13 @@ export default function Profile() {
                 </svg>
                 <span className="flex-1 ms-3 whitespace-nowrap">Users</span>
               </Link>
-            </li>
+            </li> */}
             <li>
               <Link
-                href="#"
+                href="/dashboard/supplier"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
-                <svg
-                  className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 18 20"
-                >
-                  <path d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7h2v2Zm0-5a2 2 0 1 1 4 0v1H7V4Zm6 5a1 1 0 1 1-2 0V7h2v2Z" />
-                </svg>
+                <FaBars className="text-gray-500 transition duration-7 group-hover:text-gray-900 dark:group-hover:text-white"></FaBars>
                 <span className="flex-1 ms-3 whitespace-nowrap">Products</span>
               </Link>
             </li>
@@ -153,19 +110,28 @@ export default function Profile() {
           </ul>
         </div>
       </aside>
-      <div className="lg:col-span-10 sm:col-span-12 col-span-12 m-4 grid sm:grid-cols-2 gap-4"
-        >
-        <div className="min-h-[100px] bg-indigo-500 rounded-lg shadow flex justify-center items-center">
-          <h1>Customer</h1>
+      <div className="lg:col-span-10 sm:col-span-12 col-span-12 m-4 grid sm:grid-cols-2 gap-4">
+        <div className="bg-indigo-100 hover:bg-indigo-200 rounded-lg shadow flex justify-center items-center flex-col">
+          <FaUser className="text-5xl text-gray-600"></FaUser>
+          <label className="text-4xl uppercase text-gray-600 my-3 font-bold">
+            Customer
+          </label>
         </div>
-        <div className="min-h-[100px] bg-indigo-500 rounded-lg shadow flex justify-center items-center">
-          <h1>Supplier</h1>
+        <div className=" bg-indigo-100 hover:bg-indigo-200 rounded-lg shadow flex justify-center items-center flex-col">
+          <FaBox className="text-5xl text-gray-600"></FaBox>
+          <label className="text-4xl uppercase text-gray-600 my-3 font-bold">
+            Supplier
+          </label>
         </div>
-        <div className="min-h-[100px] bg-indigo-500 rounded-lg shadow flex justify-center items-center">
-          <h1>Invoice</h1>
+        <div className="bg-indigo-100 hover:bg-indigo-200 rounded-lg shadow flex justify-center items-center flex-col">
+          <FaFileInvoice className="text-5xl text-gray-600"></FaFileInvoice>
+          <label className="text-4xl uppercase text-gray-600 my-3 font-bold">
+            Invoice
+          </label>
         </div>
-        <div className="min-h-[100px] bg-indigo-500 rounded-lg shadow flex justify-center items-center">
-          <h1>User</h1>
+        <div className="bg-indigo-100 rounded-lg hover:bg-indigo-200 shadow flex justify-center items-center flex-col">
+          <FaUser className="text-5xl text-gray-600"></FaUser>
+          <label className="text-4xl uppercase text-gray-600 my-3 font-bold">User</label>
         </div>
       </div>
     </div>

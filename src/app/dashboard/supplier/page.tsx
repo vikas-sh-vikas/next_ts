@@ -5,7 +5,13 @@ import axios from "axios";
 import Header from "@/components/header/header";
 import { useRouter } from "next/navigation";
 import Pagination from "@/components/pagination/pagination";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { Modal } from "antd";
+import { FaPlus } from "react-icons/fa";
+
 type SupplierModel = {
   _id: string;
   supplierName: string;
@@ -14,7 +20,28 @@ type SupplierModel = {
   contactPerson: string;
   contactDetail: string;
 };
+type itemModal = {
+  _id?: string;
+  itemName: string;
+  unit: string;
+  description: string;
+  hsnCode: string;
+  price: string;
+};
 function index(searchParams: any) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   const router = useRouter();
   const [data, setData] = useState<SupplierModel[]>([]);
   const [modal, setModal] = useState(false);
@@ -23,7 +50,34 @@ function index(searchParams: any) {
   const [totalRows, setTotalRows] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-
+  const defaultValues: itemModal = {
+    itemName: "",
+    unit: "",
+    description: "",
+    hsnCode: "",
+    price: "",
+  };
+  const validationSchema = yup.object({
+    itemName: yup.string().required("customerName is required"),
+    unit: yup.string().required("gstNo is required"),
+    description: yup.string().required("partyType is required"),
+    hsnCode: yup.string().required("country is required"),
+    price: yup.string().required("state is required"),
+  });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    getValues,
+    control,
+    formState: { errors, isSubmitting },
+  } = useForm<itemModal>({
+    mode: "all",
+    defaultValues,
+    resolver: yupResolver(validationSchema),
+  });
+  const formValues = getValues();
   useEffect(() => {
     getSupplierdetails(currentPage, pageSize);
   }, [pageSize]);
@@ -65,8 +119,95 @@ function index(searchParams: any) {
   const onAddClick = async () => {
     router.push("/dashboard/supplier/form");
   };
+  const onSubmit: SubmitHandler<itemModal> = async (data) => {
+    try {
+      console.log("Data",data)
+      // const response = await axios.post("/api/customers/savecustomer", data);
+      // console.log("Save sucess", response.data);
+      // toast.success("Save success");
+      // router.push("/dashboard/customer");
+    } catch (error: any) {
+      console.log("Error", error);
+      toast.error(error.message);
+    }
+  };
   return (
     <div>
+      <Modal
+        title="Item Detail"
+        open={isModalOpen}
+        footer=""
+      >
+        {" "}<form onSubmit={handleSubmit(onSubmit)}>
+        <div className="grid grid-cols-2 gap-4">
+          
+          <div>
+            <span>Item Name</span>
+            <input
+              className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+              id="customerName"
+              type="text"
+              placeholder="Enter Item Name"
+              {...register("itemName")}
+            />
+          </div>
+          <div>
+            <span>Unit</span>
+            <input
+              className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+              id="unit"
+              type="text"
+              placeholder="Enter Unit"
+              {...register("unit")}
+            />
+          </div>
+          <div>
+            <span>Description</span>
+            <input
+              className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+              id="description"
+              type="text"
+              placeholder="Enter Description Name"
+              {...register("description")}
+            />
+          </div>
+          <div>
+            <span>HSN Code</span>
+            <input
+              className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+              id="hsnCode"
+              type="text"
+              placeholder="Enter hsnCode Name"
+              {...register("hsnCode")}
+            />
+          </div>
+          <div>
+            <span>Price</span>
+            <input
+              className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+              id="price"
+              type="text"
+              placeholder="Enter Price Name"
+              {...register("price")}
+            />
+          </div>
+        </div>
+        <div className="flex justify-end">
+          <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-3"
+          type="submit"
+          // onClick={handleOk}
+          >
+            Save
+          </button>
+          <button
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-3"
+          onClick={handleCancel}>
+            Cancel
+          </button>
+        </div>
+        </form>
+      </Modal>
       <div className="p-4 flex flex-row justify-end items-center bg-slate-50">
         <input
           className="appearance-none block bg-gray-200 text-gray-700 border border-gray-200 rounded  p-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -77,19 +218,7 @@ function index(searchParams: any) {
           Search
         </button>
         <div className="p-3 text-black cursor-pointer">
-          <svg
-            onClick={onAddClick}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              fillRule="evenodd"
-              d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
-              clipRule="evenodd"
-            />
-          </svg>
+          <FaPlus onClick={showModal}></FaPlus>
         </div>
       </div>
       <hr />
@@ -198,7 +327,6 @@ function index(searchParams: any) {
         itemsPerPage={pageSize}
       />
       <div
-        
         id="deleteModal"
         tabIndex={-1}
         aria-hidden="true"

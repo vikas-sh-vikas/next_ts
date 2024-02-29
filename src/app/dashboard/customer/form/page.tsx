@@ -29,14 +29,41 @@ type CustomerModel = {
 
 function form() {
   const router = useRouter();
-  const [countryOptions, setCountryOption] = useState<Option>([
-      {"label": "Afghanistan", "value": "AF"},
-      {"label": "Albania", "value": "AL"},
-      {"label": "Algeria", "value": "DZ"},
-      {"label": "Andorra", "value": "AD"},
-      {"label": "Angola", "value": "AO"}
+  const [countryOptions, setCountryOption] = useState<Option>([])
+  const [stateOptions, setStateOption] = useState<Option>([
+    {
+      value: '1',
+      label: 'Customer',
+    },
+    {
+      value: '2',
+      label: 'Supplier',
+    }
+  ])
+  const [districtOptions, setDistrictOption] = useState<Option>([
+    {
+      value: '1',
+      label: 'Customer',
+    },
+    {
+      value: '2',
+      label: 'Supplier',
+    }
+  ])
+  const [partyOptions, setPartyOption] = useState<Option>([
+    {
+      value: '1',
+      label: 'Customer',
+    },
+    {
+      value: '2',
+      label: 'Supplier',
+    }
   ])
   const [selectCountry, setSelectCountry] = useState<Option>()
+  const [selectPatry, setSelectParty] = useState<Option>()
+  const [selectState, setSelectState] = useState<Option>()
+  const [selectDistrict, setSelectDistrict] = useState<Option>()
 
   const defaultValues: CustomerModel = {
     customerName: "",
@@ -79,7 +106,22 @@ function form() {
   const id = urlparams.get("id");
   useEffect(() => {
     getCustomerDetailByid();
+    // getCountryList()
   }, [id]);
+  // const getCountryList = async () => {
+  //   try {
+  //     const response = await axios.get(`/api/country`);
+  //     const outputArray: Option = response?.data?.data.map(({ country_code, country_name }:any) => ({
+  //       value: country_code,
+  //       label: country_name
+  //   }));
+
+  //     setCountryOption(outputArray)
+  //   } catch (error:any) {
+  //     console.log(error);
+      
+  //   }
+  // }
   const getCustomerDetailByid = async () => {
     // if(id){
     const data = {
@@ -90,9 +132,17 @@ function form() {
       const response = await axios.post(`/api/customers/getCustomerById`, data);
       const apiData = response.data.data;
       // console.log("EditData",apiData.country);
-      const select = countryOptions.filter(person => person.value == apiData.country); 
+      
+      const country = countryOptions.filter(person => person.value == apiData?.country); 
+      const state = stateOptions.filter(person => person.value == apiData?.state); 
+      const party = partyOptions.filter(person => person.value == apiData?.partyType); 
+      const district = districtOptions.filter(person => person.value == apiData?.district); 
+
       // console.log("FilterData",olderThan25);
-      setSelectCountry(select);
+      setSelectCountry(country);
+      setSelectParty(party);
+      setSelectState(state);
+      setSelectDistrict(district)
       reset({
         ...apiData,
       });
@@ -157,21 +207,10 @@ function form() {
               <Select
                 isSearchable={true}
                 name="partyType"
-                // value={formValues?.partyType}
-                options={[
-                  {
-                    value: '1',
-                    label: 'Customer',
-                  },
-                  {
-                    value: '2',
-                    label: 'Supplier',
-                  }
-                ]}
+                value={selectPatry}
+                options={partyOptions}
                 onChange={(selected: any) => {
-                  // setValue("partyType", selected.label, {
-                  //   // shouldValidate: true,
-                  // });
+                  setSelectParty(selected)
                   setValue("partyType", selected.value, {
                     // shouldValidate: true,
                   });
@@ -180,12 +219,6 @@ function form() {
             </div>
           </div>
           <hr className="mb-4"></hr>
-          {/* <span
-            className=" p-4 block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-          >
-            Address
-          </span> */}
-
           <div className="grid grid-cols-3 gap-4  p-4">
             <div>
               <label
@@ -193,7 +226,14 @@ function form() {
               >
                 Country
               </label>
-              <Select
+              <input
+                className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                id="country"
+                {...register("country")}
+                type="text"
+                placeholder="Enter countryy No."
+              />
+              {/* <Select
                 isSearchable={true}
                 name="country"
                 value={selectCountry}
@@ -207,7 +247,7 @@ function form() {
                     // shouldValidate: true,
                   });
                 }}
-              />
+              /> */}
             </div>
             <div>
               <label
@@ -215,21 +255,21 @@ function form() {
               >
                 State
               </label>
-              <Select
+              <input
+                className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                id="state"
+                {...register("state")}
+                type="text"
+                placeholder="Enter state No."
+                
+              />
+              {/* <Select
                 isSearchable={true}
                 name="state"
-                // value={formValues?.partyType}
-                options={[
-                  {
-                    value: '1',
-                    label: 'Customer',
-                  },
-                  {
-                    value: '2',
-                    label: 'Supplier',
-                  }
-                ]}
+                value={selectState}
+                options={stateOptions}
                 onChange={(selected: any) => {
+                  setSelectState(selected)
                   // setValue("state", selected.label, {
                   //   // shouldValidate: true,
                   // });
@@ -237,7 +277,7 @@ function form() {
                     shouldValidate: true,
                   });
                 }}
-              />
+              /> */}
             </div>
             <div>
               <label
@@ -245,29 +285,28 @@ function form() {
               >
                 District
               </label>
-              <Select
+              <input
+                className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                id="district"
+                {...register("district")}
+                type="text"
+                placeholder="Enter district No."
+              />
+              {/* <Select
                 isSearchable={true}
                 name="district"
-                // value={formValues?.partyType}
-                options={[
-                  {
-                    value: '1',
-                    label: 'Customer',
-                  },
-                  {
-                    value: '2',
-                    label: 'Supplier',
-                  }
-                ]}
+                value={selectDistrict}
+                options={districtOptions}
                 onChange={(selected: any) => {
                   // setValue("district", selected.label, {
                   //   // shouldValidate: true,
                   // });
+                  setSelectDistrict(selected),
                   setValue("district", selected.value, {
                     // shouldValidate: true,
                   });
                 }}
-              />
+              /> */}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4  p-4">

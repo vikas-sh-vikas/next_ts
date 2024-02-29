@@ -58,6 +58,7 @@ export default function Header() {
           Home
         </Link>
       </div>
+      <hr />
     </div>
   );
 }
