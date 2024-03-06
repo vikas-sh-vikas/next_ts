@@ -21,7 +21,7 @@ type SupplierModel = {
   contactDetail: string;
 };
 type itemModal = {
-  _id?: string;
+  _id?: any;
   itemName: string;
   unit: string;
   description: string;
@@ -43,7 +43,7 @@ function index(searchParams: any) {
     setIsModalOpen(false);
   };
   const router = useRouter();
-  const [data, setData] = useState<SupplierModel[]>([]);
+  const [data, setData] = useState<itemModal[]>([]);
   const [modal, setModal] = useState(false);
   const [supplierName, setSupplierName] = useState("");
   const [SupplierId, setSupplierId] = useState("");
@@ -51,6 +51,7 @@ function index(searchParams: any) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const defaultValues: itemModal = {
+    _id:"",
     itemName: "",
     unit: "",
     description: "",
@@ -58,6 +59,7 @@ function index(searchParams: any) {
     price: "",
   };
   const validationSchema = yup.object({
+    // _id: yup.string().required("customerName is required"),
     itemName: yup.string().required("customerName is required"),
     unit: yup.string().required("gstNo is required"),
     description: yup.string().required("partyType is required"),
@@ -79,11 +81,12 @@ function index(searchParams: any) {
   });
   const formValues = getValues();
   useEffect(() => {
-    getSupplierdetails(currentPage, pageSize);
+    getItemDetails(currentPage, pageSize);
+
   }, [pageSize]);
-  console.log("currentPage", currentPage);
-  const getSupplierdetails = async (currentPage: number, pageSize: number) => {
-    const res = await axios.get("/api/supplier/getSupplier");
+  const getItemDetails = async (currentPage: number, pageSize: number) => {
+    const res = await axios.get("/api/item/getItem");
+    console.log(res.data)
     const TotalNoofPages = res.data.data.length;
     setData(res.data.data);
     setTotalRows(TotalNoofPages);
@@ -91,8 +94,43 @@ function index(searchParams: any) {
   console.log("SearchParamas", searchParams);
   const editFunction = async (id: string) => {
     console.log("Clicked edit", id);
-    router.push("/dashboard/supplier/form?id=" + id);
+    const data = {
+      id: id,
+    }
+    // }
+    try {
+      const response = await axios.post(
+        `/api/item/getItemById`,data
+      );
+      const apiData = response.data.data;
+      console.log(apiData)
+      reset({
+        ...apiData,    } )
+        setIsModalOpen(true)
+      }
+        
+      catch (error: any) {
+      console.log(error);
+    }
+    // router.push("/dashboard/supplier/form?id=" + id);
   };
+  // const getSupplierDetailByid = async () => {
+  //   // if(id){
+  //   const data = {
+  //     id: id,
+  //   }
+  //   // }
+  //   try {
+  //     const response = await axios.post(
+  //       `/api/customers/getCustomerById`,data
+  //     );
+  //     const apiData = response.data.data;
+  //     console.log(apiData)
+  //     setSupplier({ ...apiData})
+  //   } catch (error: any) {
+  //     console.log(error);
+  //   }
+  // }
   const deleteFunction = async (id: string, customerName: string) => {
     const data = {
       id: id,
@@ -110,25 +148,30 @@ function index(searchParams: any) {
     try {
       const response = await axios.post(`/api/customers/deleteCustomer`, data);
       await setModal(!modal);
-      getSupplierdetails(currentPage, pageSize);
+      getItemDetails(currentPage, pageSize);
     } catch (error: any) {
       console.log(error);
       setModal(!modal);
     }
   };
+
   const onAddClick = async () => {
     router.push("/dashboard/supplier/form");
   };
   const onSubmit: SubmitHandler<itemModal> = async (data) => {
+  console.log("call Save")
     try {
       console.log("Data",data)
-      // const response = await axios.post("/api/customers/savecustomer", data);
+      const response = await axios.post("/api/item/saveEditItem", data);
       // console.log("Save sucess", response.data);
-      // toast.success("Save success");
-      // router.push("/dashboard/customer");
+      toast.success("Save success");
+      setIsModalOpen(false)
+      getItemDetails(currentPage, pageSize);
+      // router.push("/dashboard/supplier");
     } catch (error: any) {
       console.log("Error", error);
       toast.error(error.message);
+      setIsModalOpen(false)
     }
   };
   return (
@@ -138,7 +181,7 @@ function index(searchParams: any) {
         open={isModalOpen}
         footer=""
       >
-        {" "}<form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-2 gap-4">
           
           <div>
@@ -229,22 +272,16 @@ function index(searchParams: any) {
               Sr. No.
             </th>
             <th scope="col" className="px-6 py-3">
-              Supplier Name
+              Item Name
             </th>
             <th scope="col" className="px-6 py-3">
-              GST No.
+              Unit
             </th>
             <th scope="col" className="px-6 py-3">
-              Address
+              HSN Code
             </th>
             <th scope="col" className="px-6 py-3">
-              Contact Person
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Contact Detail
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Action
+            Description
             </th>
           </tr>
         </thead>
@@ -259,11 +296,10 @@ function index(searchParams: any) {
                 <td className="px-6 py-4">
                   {idx + 1 + (currentPage - 1) * pageSize}
                 </td>
-                <td className="px-6 py-4">{item?.supplierName}</td>
-                <td className="px-6 py-4">{item?.gstNo}</td>
-                <td className="px-6 py-4">{item?.address}</td>
-                <td className="px-6 py-4">{item?.contactPerson}</td>
-                <td className="px-6 py-4">{item?.contactDetail}</td>
+                <td className="px-6 py-4">{item?.itemName}</td>
+                <td className="px-6 py-4">{item?.unit}</td>
+                <td className="px-6 py-4">{item?.hsnCode}</td>
+                <td className="px-6 py-4">{item?.description}</td>
                 <td className="px-6 py-4 flex flex-row">
                   <div
                     className="text-black cursor-pointer"
@@ -282,7 +318,7 @@ function index(searchParams: any) {
 
                   <button
                     onClick={() =>
-                      deleteFunction(item?._id, item?.supplierName)
+                      deleteFunction(item?._id, item?.itemName)
                     }
                     id="deleteButton"
                     data-modal-target="deleteModal"
@@ -321,7 +357,7 @@ function index(searchParams: any) {
         fetchdata={(currentPage, pageSize) => {
           setPageSize(pageSize);
           console.log("Pagination Page Size-----<", pageSize),
-            getSupplierdetails(currentPage, pageSize);
+          getItemDetails(currentPage, pageSize);
         }}
         // searchText={searchText || ""}
         itemsPerPage={pageSize}

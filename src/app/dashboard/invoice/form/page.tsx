@@ -135,6 +135,7 @@ function Form() {
   const downloadPDF = async () => {
     let html: any = await fetch(`/template/invoiceReport.html`);
     html = await html.text();
+    // console.log("HTML", html);
     const item = formValues?.itemList;
     html = html
       .toString()
@@ -177,8 +178,7 @@ function Form() {
       .replace("@sgstper@", formValues?.sgst?.label)
       .replace("@total@", formValues?.totalAmount)
       .replace("@totalGst@", formValues?.totalAmountGst);
-
-    console.log(html);
+    // console.log(html);
     const opt = {
       margin: [20, 20, 20, 20],
       zoom: "100%",
@@ -194,12 +194,7 @@ function Form() {
       jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
     };
     console.log("html", html);
-    html2pdf()
-      .set(opt)
-      .from(html)
-      .toPdf()
-      .get("pdf")
-      .output("dataurlnewwindow");
+    html2pdf().set(opt).from(html).toPdf().get("pdf").output("dataurlnewwindow");
   };
   const getCustomerdetails = async () => {
     try {
@@ -627,7 +622,7 @@ function Form() {
                           // Limit the value to 100
                           const limitedQty =
                             enteredQty > 100 ? 100 : enteredQty;
-                          console.log("Value")
+                          console.log("Value");
                           setValue(
                             `itemList.${index}.subTotal`,
                             subTotalCal(
@@ -639,13 +634,9 @@ function Form() {
                               shouldValidate: true,
                             }
                           );
-                          setValue(
-                            `itemList.${index}.qty`,
-                            limitedQty,
-                            {
-                              shouldValidate: true,
-                            }
-                          );
+                          setValue(`itemList.${index}.qty`, limitedQty, {
+                            shouldValidate: true,
+                          });
                         }}
                       />
                     </td>
