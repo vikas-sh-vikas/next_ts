@@ -144,7 +144,7 @@ function Form() {
         (formValues?.itemList || []).map(
           (item, index) =>
             `<tr key={index}>
-          <td>${index + 1}</td>
+          <td style="height: 50px;">${index + 1}</td>
           <td>
             ${item.description}
           </td>
