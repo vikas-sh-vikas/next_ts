@@ -23,8 +23,8 @@ type CustomerModel = {
     label?: string;
     value?: number;
   };
-  labourCharge?: number;
-  freight?: number;
+  labourCharge?: any;
+  freight?: any;
   gstType?: {
     label?: string;
     value?: number | undefined;
@@ -155,13 +155,13 @@ function Form() {
             ${item.qty}
           </td>
           <td>
-            ${item.unitPrice}
+          ₹ ${item.unitPrice}
           </td>
           <td>
-            ${item.discount}
+            ${item.discount} %
           </td>
           <td>
-            ${item.subTotal}
+          ₹ ${item.subTotal}
           </td>
         </tr>`
         )
@@ -170,12 +170,12 @@ function Form() {
       .replace("@date@", formValues?.date)
       .replace("@shipTo@", formValues?.shipTo?.label)
       .replace("@billTo@", formValues?.billTo?.label)
-      .replace("@labourCharge@", formValues?.labourCharge)
+      .replace("@labourCharge@", parseInt(formValues?.labourCharge) + parseInt(formValues?.freight) )
       .replace("@freight@", formValues?.freight)
       .replace("@gstType@", formValues?.gstType?.label)
-      .replace("@igstper@", formValues?.igst?.label)
-      .replace("@cgstper@", formValues?.cgst?.label)
-      .replace("@sgstper@", formValues?.sgst?.label)
+      .replace("@igstper@", formValues?.igst?.label ? formValues?.igst?.label : "")
+      .replace("@cgstper@", formValues?.cgst?.label ? formValues?.cgst?.label : "")
+      .replace("@sgstper@", formValues?.sgst?.label ? formValues?.sgst?.label : "")
       .replace("@total@", formValues?.totalAmount)
       .replace("@totalGst@", formValues?.totalAmountGst);
     // console.log(html);
