@@ -61,11 +61,11 @@ function Index() {
     }
   };
   const onAddClick = async () => {
-    router.push("/dashboard/customer/form");
+    router.push("/dashboard/party/form");
   };
   return (
-    <div>
-      <div className="p-4 flex flex-row justify-end items-center bg-slate-50">
+    <div className="bg-white">
+      <div className="p-4 flex flex-row justify-end items-center">
         <input
           className="appearance-none block bg-gray-200 text-gray-700 border border-gray-200 rounded  p-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
           type="text"
@@ -91,6 +91,7 @@ function Index() {
         </div>
       </div>
       <hr />
+      <div  style={{ height: '78vh' }}>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
@@ -198,6 +199,7 @@ function Index() {
             itemsPerPage={10}
           />
         {/* )} */}
+      </div>
       </div>
       {/* Delete Modla */}
       <div

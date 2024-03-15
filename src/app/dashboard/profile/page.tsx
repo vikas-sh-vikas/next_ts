@@ -4,20 +4,20 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 // import { useAppSelector } from "@/redux/store";
 import Link from "next/link";
-import { FaUser, FaBox, FaFileInvoice,FaBars } from "react-icons/fa";
+import { FaUser, FaBox, FaFileInvoice, FaBars } from "react-icons/fa";
 
 export default function Profile() {
   const router = useRouter();
   // const username = useAppSelector((state) => state.authReducer.value.username);
   return (
-    <div className="grid grid-cols-12">
+    <div className="bg-white grid grid-cols-12">
       <aside
         style={{ height: "90vh" }}
         id="default-sidebar"
         className="hidden col-span-2 h-screen lg:block"
         aria-label="Sidebar"
       >
-        <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50">
+        <div className="h-full px-3 py-4 overflow-y-auto bg-white">
           <ul className="space-y-2 font-medium">
             <li>
               <Link
@@ -33,11 +33,12 @@ export default function Profile() {
                 href="/dashboard/invoice"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
-<FaFileInvoice className="text-gray-500 transition duration-7 group-hover:text-gray-900 dark:group-hover:text-white"></FaFileInvoice>                <span className="flex-1 ms-3 whitespace-nowrap">Invoice</span>
+                <FaFileInvoice className="text-gray-500 transition duration-7 group-hover:text-gray-900 dark:group-hover:text-white"></FaFileInvoice>{" "}
+                <span className="flex-1 ms-3 whitespace-nowrap">Invoice</span>
                 {/* <span className="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
                   3
                 </span> */}
-              </Link>  
+              </Link>
             </li>
             {/* <li>
               <Link
@@ -58,7 +59,7 @@ export default function Profile() {
             </li> */}
             <li>
               <Link
-                href="/dashboard/supplier"
+                href="/dashboard/products"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <FaBars className="text-gray-500 transition duration-7 group-hover:text-gray-900 dark:group-hover:text-white"></FaBars>
@@ -131,7 +132,9 @@ export default function Profile() {
         </div>
         <div className="bg-indigo-100 rounded-lg hover:bg-indigo-200 shadow flex justify-center items-center flex-col">
           <FaUser className="text-5xl text-gray-600"></FaUser>
-          <label className="text-4xl uppercase text-gray-600 my-3 font-bold">User</label>
+          <label className="text-4xl uppercase text-gray-600 my-3 font-bold">
+            User
+          </label>
         </div>
       </div>
     </div>

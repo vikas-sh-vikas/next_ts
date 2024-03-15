@@ -41,7 +41,7 @@ export default function Header() {
     setUsername(Username)
   },[])
   return (
-    <div >
+    <div  style={{ height: '10vh' }}>
       <div className="bg-gray-50 flex flex-row items-center justify-end">
       <Avatar size="large" icon={<UserOutlined />} />
         <span className="text-gray-900 hover:bg-gray-100 cursor-default px-4">{username}</span>
