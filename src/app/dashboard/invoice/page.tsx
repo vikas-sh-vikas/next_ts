@@ -45,7 +45,7 @@ function Index() {
   // console.log("Data", data);
   const editFunction = async (id: string) => {
     console.log("Clicked edit", id);
-    router.push("/dashboard/invoice/form?id=" + id);
+    router.push(`/dashboard/invoice/${id}`);
   };
   const deleteFunction = async (id: string, customerName: string) => {
     const data = {

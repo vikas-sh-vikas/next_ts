@@ -101,15 +101,11 @@ function Form({params}:any) {
     resolver: yupResolver(validationSchema),
   });
   const formValues = getValues();
-
-  // const urlparams = new URLSearchParams(location.search);
-  // const id = params.id;
   const id = "";
   console.log("param Id",id)
   useEffect(() => {
-    getCustomerDetailByid();
     // getCountryList()
-  }, [id]);
+  }, []);
   // const getCountryList = async () => {
   //   try {
   //     const response = await axios.get(`/api/country`);
@@ -124,48 +120,18 @@ function Form({params}:any) {
       
   //   }
   // }
-  const getCustomerDetailByid = async () => {
-    // if(id){
-    const data = {
-      id: id,
-    };
-    // }
-    try {
-      const response = await axios.post(`/api/customers/getCustomerById`, data);
-      const apiData = response.data.data;
-      // console.log("EditData",apiData.country);
-      
-      const country = countryOptions.filter(person => person.value == apiData?.country); 
-      const state = stateOptions.filter(person => person.value == apiData?.state); 
-      const party = partyOptions.filter(person => person.value == apiData?.partyType); 
-      const district = districtOptions.filter(person => person.value == apiData?.district); 
-
-      // console.log("FilterData",olderThan25);
-      setSelectCountry(country);
-      setSelectParty(party);
-      setSelectState(state);
-      setSelectDistrict(district)
-      reset({
-        ...apiData,
-      });
-      // setCustomer({ ...apiData });
-    } catch (error: any) {
-      console.log(error);
-    }
-  };
   const onSubmit: SubmitHandler<CustomerModel> = async (data) => {
     try {
       console.log("Data",data)
       const response = await axios.post("/api/customers/savecustomer", data);
       console.log("Save sucess", response.data);
       toast.success("Save success");
-      router.push("/dashboard/customer");
+      router.push("/dashboard/party");
     } catch (error: any) {
       console.log("Error", error);
       toast.error(error.message);
     }
   };
-  console.log("Formvalues",selectCountry)
   return (
     <>
       <div>
@@ -378,7 +344,7 @@ function Form({params}:any) {
               {"Submit"}
             </button>
             <button
-              onClick={() => router.push("/dashboard/customer")}
+              onClick={() => router.push("/dashboard/party")}
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-4"
             >
               {"Cancel"}

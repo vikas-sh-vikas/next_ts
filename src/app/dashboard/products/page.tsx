@@ -31,9 +31,7 @@ type itemModal = {
 function Index(searchParams: any) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
+
 
   const handleOk = () => {
     setIsModalOpen(false);
@@ -51,7 +49,7 @@ function Index(searchParams: any) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const defaultValues: itemModal = {
-    _id:"",
+    _id: "",
     itemName: "",
     unit: "",
     description: "",
@@ -79,14 +77,17 @@ function Index(searchParams: any) {
     defaultValues,
     resolver: yupResolver(validationSchema),
   });
+  const showModal = () => {
+    // reset({});
+    setIsModalOpen(true);
+  };
   const formValues = getValues();
   useEffect(() => {
     getItemDetails(currentPage, pageSize);
-
   }, [pageSize]);
   const getItemDetails = async (currentPage: number, pageSize: number) => {
     const res = await axios.get("/api/item/getItem");
-    console.log(res.data)
+    console.log(res.data);
     const TotalNoofPages = res.data.data.length;
     setData(res.data.data);
     setTotalRows(TotalNoofPages);
@@ -96,20 +97,17 @@ function Index(searchParams: any) {
     console.log("Clicked edit", id);
     const data = {
       id: id,
-    }
+    };
     // }
     try {
-      const response = await axios.post(
-        `/api/item/getItemById`,data
-      );
+      const response = await axios.post(`/api/item/getItemById`, data);
       const apiData = response.data.data;
-      console.log(apiData)
+      console.log(apiData);
       reset({
-        ...apiData,    } )
-        setIsModalOpen(true)
-      }
-        
-      catch (error: any) {
+        ...apiData,
+      });
+      setIsModalOpen(true);
+    } catch (error: any) {
       console.log(error);
     }
     // router.push("/dashboard/supplier/form?id=" + id);
@@ -159,96 +157,94 @@ function Index(searchParams: any) {
     router.push("/dashboard/supplier/form");
   };
   const onSubmit: SubmitHandler<itemModal> = async (data) => {
-  console.log("call Save")
+    console.log("call Save");
     try {
-      console.log("Data",data)
+      console.log("Data", data);
       const response = await axios.post("/api/item/saveEditItem", data);
       // console.log("Save sucess", response.data);
       toast.success("Save success");
-      setIsModalOpen(false)
+      setIsModalOpen(false);
       getItemDetails(currentPage, pageSize);
       // router.push("/dashboard/supplier");
     } catch (error: any) {
       console.log("Error", error);
       toast.error(error.message);
-      setIsModalOpen(false)
+      setIsModalOpen(false);
     }
   };
   return (
     <div>
-      <Modal
-        title="Item Detail"
-        open={isModalOpen}
-        footer=""
-      >
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-2 gap-4">
-          
-          <div>
-            <span>Item Name</span>
-            <input
-              className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
-              id="customerName"
-              type="text"
-              placeholder="Enter Item Name"
-              {...register("itemName")}
-            />
+      <Modal title="Item Detail" 
+  onCancel={handleCancel}  open={isModalOpen} footer="">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <span>Item Name</span>
+              <input
+                className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                id="customerName"
+                type="text"
+                placeholder="Enter Item Name"
+                {...register("itemName")}
+              />
+            </div>
+            <div>
+              <span>Unit</span>
+              <input
+                className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                id="unit"
+                type="text"
+                placeholder="Enter Unit"
+                {...register("unit")}
+              />
+            </div>
+            <div>
+              <span>Description</span>
+              <input
+                className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                id="description"
+                type="text"
+                placeholder="Enter Description Name"
+                {...register("description")}
+              />
+            </div>
+            <div>
+              <span>HSN Code</span>
+              <input
+                className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                id="hsnCode"
+                type="text"
+                placeholder="Enter hsnCode Name"
+                {...register("hsnCode")}
+              />
+            </div>
+            <div>
+              <span>Price</span>
+              <input
+                className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
+                id="price"
+                type="text"
+                placeholder="Enter Price Name"
+                {...register("price")}
+              />
+            </div>
           </div>
-          <div>
-            <span>Unit</span>
-            <input
-              className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
-              id="unit"
-              type="text"
-              placeholder="Enter Unit"
-              {...register("unit")}
-            />
+          <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-3"
+              type="submit"
+              // onClick={handleOk}
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-3"
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
           </div>
-          <div>
-            <span>Description</span>
-            <input
-              className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
-              id="description"
-              type="text"
-              placeholder="Enter Description Name"
-              {...register("description")}
-            />
-          </div>
-          <div>
-            <span>HSN Code</span>
-            <input
-              className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
-              id="hsnCode"
-              type="text"
-              placeholder="Enter hsnCode Name"
-              {...register("hsnCode")}
-            />
-          </div>
-          <div>
-            <span>Price</span>
-            <input
-              className="w-full text-gray-700 border border-gray-200 rounded py-2 px-2 mb-3 focus:outline-none"
-              id="price"
-              type="text"
-              placeholder="Enter Price Name"
-              {...register("price")}
-            />
-          </div>
-        </div>
-        <div className="flex justify-end">
-          <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-3"
-          type="submit"
-          // onClick={handleOk}
-          >
-            Save
-          </button>
-          <button
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-3"
-          onClick={handleCancel}>
-            Cancel
-          </button>
-        </div>
         </form>
       </Modal>
       <div className="p-4 flex flex-row justify-end items-center bg-slate-50">
@@ -261,7 +257,10 @@ function Index(searchParams: any) {
           Search
         </button>
         <div className="p-3 text-black cursor-pointer">
-          <FaPlus onClick={showModal}></FaPlus>
+          <FaPlus onClick={() => {
+            reset();
+            showModal();
+          }}></FaPlus>
         </div>
       </div>
       <hr />
@@ -281,7 +280,7 @@ function Index(searchParams: any) {
               HSN Code
             </th>
             <th scope="col" className="px-6 py-3">
-            Description
+              Description
             </th>
           </tr>
         </thead>
@@ -317,9 +316,7 @@ function Index(searchParams: any) {
                   </div>
 
                   <button
-                    onClick={() =>
-                      deleteFunction(item?._id, item?.itemName)
-                    }
+                    onClick={() => deleteFunction(item?._id, item?.itemName)}
                     id="deleteButton"
                     data-modal-target="deleteModal"
                     data-modal-toggle="deleteModal"
@@ -357,7 +354,7 @@ function Index(searchParams: any) {
         fetchdata={(currentPage, pageSize) => {
           setPageSize(pageSize);
           console.log("Pagination Page Size-----<", pageSize),
-          getItemDetails(currentPage, pageSize);
+            getItemDetails(currentPage, pageSize);
         }}
         // searchText={searchText || ""}
         itemsPerPage={pageSize}

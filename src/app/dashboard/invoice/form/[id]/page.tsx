@@ -54,7 +54,7 @@ type CustomerModel = {
   }[];
 };
 
-function Form() {
+function Form({params}: any) {
   const router = useRouter();
   const [selectOptionShip, setSelectOptionShip] = useState([{}]);
   const defaultValues: CustomerModel = {
@@ -79,11 +79,13 @@ function Form() {
 
   // const urlparams = new URLSearchParams(location.search);
   // const id = urlparams.get("id");
+  const id = params.id;
   // const html2pdf = require("html2pdf.js");
   
   useEffect(() => {
     getCustomerdetails();
-  }, []);
+    getInvoiceDetailByid();
+  }, [id]);
   const gstOptions = [
     {
       label: "5%",
@@ -222,6 +224,73 @@ function Form() {
       setSelectOptionShip(newArray);
     } catch (error) {
       console.log("Error", error);
+    }
+  };
+  const getInvoiceDetailByid = async () => {
+    const data = {
+      id: id,
+    };
+    // }
+    try {
+      const response = await axios.post(`/api/invoice/getInvoiceById`, data);
+      const apiData: any = response.data.data;
+      // console.log("Invoice Number in Edit", apiData);
+      // setValue("invoiceNo",apiData.invoiceNo);;
+      const gstTypeFilter: any = gstType.filter(
+        (gstType) => gstType.value === apiData.gstType
+      );
+      const igstFilter: any = gstOptions.filter(
+        (gstType) => gstType.value === apiData.igst
+      );
+      const sgstTypeFilter: any = sgstOptions.filter(
+        (gstType) => gstType.value === apiData.sgst
+      );
+      const cgstTypeFilter: any = sgstOptions.filter(
+        (gstType) => gstType.value === apiData.cgst
+      );
+      console.log("igstType ----- > ", sgstTypeFilter);
+      reset({
+        ...apiData,
+        shipTo: { label: apiData.shipToName, value: apiData.shipTo },
+        billTo: { label: apiData.shipToName, value: apiData.shipTo },
+        gstType: {
+          label: gstTypeFilter[0].label,
+          value: gstTypeFilter[0].value,
+        },
+        igst:
+          apiData.gstType == 1
+            ? {
+                label: igstFilter[0].label,
+                value: igstFilter[0].value,
+              }
+            : igstFilter,
+        cgst:
+          apiData.gstType == 2
+            ? {
+                label: sgstTypeFilter[0].label,
+                value: sgstTypeFilter[0].value,
+              }
+            : cgstTypeFilter,
+        sgst:
+          apiData.gstType == 2
+            ? {
+                label: cgstTypeFilter[0].label,
+                value: cgstTypeFilter[0].value,
+              }
+            : sgstTypeFilter,
+      });
+      try {
+        const response = await axios.post(
+          `/api/invoice/getInvoiceMaterialById`,
+          data
+        );
+        const apiData: any = response.data.data;
+        setValue("itemList", apiData);
+      } catch (error: any) {
+        console.log(error);
+      }
+    } catch (error: any) {
+      console.log(error);
     }
   };
   const schema = yup
