@@ -18,8 +18,9 @@ function Forgetpassword() {
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [loading, setloading] = useState(false);
   const [data, setData] = useState({});
-  const urlparams = new URLSearchParams(location.search);
-  const id = urlparams.get("id");
+  // const urlparams = new URLSearchParams(location.search);
+  // const id = urlparams.get("id");
+  const id = "";
   const onLogin = async () => {
     if(user.newPassword == user.matchPassword && user.newPassword != "" && user.matchPassword != ""){
       try {

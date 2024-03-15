@@ -77,9 +77,11 @@ function Form() {
   };
   const [formData, setFormData] = useState<CustomerModel>(defaultValues);
 
-  const urlparams = new URLSearchParams(location.search);
-  const id = urlparams.get("id");
-  const html2pdf = require("html2pdf.js");
+  // const urlparams = new URLSearchParams(location.search);
+  // const id = urlparams.get("id");
+  const id = "";
+  // const html2pdf = require("html2pdf.js");
+  
   useEffect(() => {
     getCustomerdetails();
     if (id) {
@@ -132,87 +134,87 @@ function Form() {
       value: 14,
     },
   ];
-  const downloadPDF = async () => {
-    let html: any = await fetch(`/template/invoiceReport.html`);
-    html = await html.text();
-    // console.log("HTML", html);
-    const item = formValues?.itemList;
-    html = html
-      .toString()
-      .replace(
-        "@Name@",
-        (formValues?.itemList || []).map(
-          (item, index) =>
-            `<tr key={index}>
-          <td style="height: 50px;">${index + 1}</td>
-          <td>
-            ${item.description}
-          </td>
-          <td>
-            ${item.unit}
-          </td>
-          <td>
-            ${item.qty}
-          </td>
-          <td>
-          ₹ ${item.unitPrice}
-          </td>
-          <td>
-            ${item.discount} %
-          </td>
-          <td>
-          ₹ ${item.subTotal}
-          </td>
-        </tr>`
-        )
-      )
-      .replace("@invoiceNo@", formValues?.invoiceNo)
-      .replace("@date@", formValues?.date)
-      .replace("@shipTo@", formValues?.shipTo?.label)
-      .replace("@billTo@", formValues?.billTo?.label)
-      .replace(
-        "@labourCharge@",
-        parseInt(formValues?.labourCharge) + parseInt(formValues?.freight)
-      )
-      .replace("@freight@", formValues?.freight)
-      .replace("@gstType@", formValues?.gstType?.label)
-      .replace(
-        "@igstper@",
-        formValues?.igst?.label ? formValues?.igst?.label : ""
-      )
-      .replace(
-        "@cgstper@",
-        formValues?.cgst?.label ? formValues?.cgst?.label : ""
-      )
-      .replace(
-        "@sgstper@",
-        formValues?.sgst?.label ? formValues?.sgst?.label : ""
-      )
-      .replace("@total@", formValues?.totalAmount)
-      .replace("@totalGst@", formValues?.totalAmountGst);
-    // console.log(html);
-    const opt = {
-      margin: [20, 20, 20, 20],
-      zoom: "100%",
-      filename: "test.pdf",
-      image: { type: "jpeg", quality: 1 },
-      html2canvas: {
-        dpi: 192,
-        scale: 4,
-        letterRendering: true,
-        useCORS: true,
-        scrollY: 0,
-      },
-      jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
-    };
-    console.log("html", html);
-    html2pdf()
-      .set(opt)
-      .from(html)
-      .toPdf()
-      .get("pdf")
-      .output("dataurlnewwindow");
-  };
+  // const downloadPDF = async () => {
+  //   let html: any = await fetch(`/template/invoiceReport.html`);
+  //   html = await html.text();
+  //   // console.log("HTML", html);
+  //   const item = formValues?.itemList;
+  //   html = html
+  //     .toString()
+  //     .replace(
+  //       "@Name@",
+  //       (formValues?.itemList || []).map(
+  //         (item, index) =>
+  //           `<tr key={index}>
+  //         <td style="height: 50px;">${index + 1}</td>
+  //         <td>
+  //           ${item.description}
+  //         </td>
+  //         <td>
+  //           ${item.unit}
+  //         </td>
+  //         <td>
+  //           ${item.qty}
+  //         </td>
+  //         <td>
+  //         ₹ ${item.unitPrice}
+  //         </td>
+  //         <td>
+  //           ${item.discount} %
+  //         </td>
+  //         <td>
+  //         ₹ ${item.subTotal}
+  //         </td>
+  //       </tr>`
+  //       )
+  //     )
+  //     .replace("@invoiceNo@", formValues?.invoiceNo)
+  //     .replace("@date@", formValues?.date)
+  //     .replace("@shipTo@", formValues?.shipTo?.label)
+  //     .replace("@billTo@", formValues?.billTo?.label)
+  //     .replace(
+  //       "@labourCharge@",
+  //       parseInt(formValues?.labourCharge) + parseInt(formValues?.freight)
+  //     )
+  //     .replace("@freight@", formValues?.freight)
+  //     .replace("@gstType@", formValues?.gstType?.label)
+  //     .replace(
+  //       "@igstper@",
+  //       formValues?.igst?.label ? formValues?.igst?.label : ""
+  //     )
+  //     .replace(
+  //       "@cgstper@",
+  //       formValues?.cgst?.label ? formValues?.cgst?.label : ""
+  //     )
+  //     .replace(
+  //       "@sgstper@",
+  //       formValues?.sgst?.label ? formValues?.sgst?.label : ""
+  //     )
+  //     .replace("@total@", formValues?.totalAmount)
+  //     .replace("@totalGst@", formValues?.totalAmountGst);
+  //   // console.log(html);
+  //   const opt = {
+  //     margin: [20, 20, 20, 20],
+  //     zoom: "100%",
+  //     filename: "test.pdf",
+  //     image: { type: "jpeg", quality: 1 },
+  //     html2canvas: {
+  //       dpi: 192,
+  //       scale: 4,
+  //       letterRendering: true,
+  //       useCORS: true,
+  //       scrollY: 0,
+  //     },
+  //     jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
+  //   };
+  //   console.log("html", html);
+  //   html2pdf()
+  //     .set(opt)
+  //     .from(html)
+  //     .toPdf()
+  //     .get("pdf")
+  //     .output("dataurlnewwindow");
+  // };
   const getCustomerdetails = async () => {
     try {
       const res = await axios.get("/api/customers/getcustomer");
@@ -940,7 +942,7 @@ function Form() {
             </button>
             <button
               type="button"
-              onClick={() => downloadPDF()}
+              // onClick={() => downloadPDF()}
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-4"
             >
               {"View Report"}

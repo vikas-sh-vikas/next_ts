@@ -27,7 +27,7 @@ type CustomerModel = {
   contactDetail?: string;
 };
 
-function Form() {
+function Form({params}:any) {
   const router = useRouter();
   const [countryOptions, setCountryOption] = useState<Option>([])
   const [stateOptions, setStateOption] = useState<Option>([
@@ -102,8 +102,10 @@ function Form() {
   });
   const formValues = getValues();
 
-  const urlparams = new URLSearchParams(location.search);
-  const id = urlparams.get("id");
+  // const urlparams = new URLSearchParams(location.search);
+  // const id = params.id;
+  const id = "";
+  console.log("param Id",id)
   useEffect(() => {
     getCustomerDetailByid();
     // getCountryList()

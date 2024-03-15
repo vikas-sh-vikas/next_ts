@@ -27,8 +27,9 @@ function Form() {
     contactPerson: "",
     contactDetail: "",
   };
-  const urlparams = new URLSearchParams(location.search);
-  const id = urlparams.get("id");
+  // const urlparams = new URLSearchParams(location.search);
+  // const id = urlparams.get("id");
+  const id = "";
   const [supplier, setSupplier] = useState<SupplierModel>(defaultValues);
   useEffect(() => {
         getSupplierDetailByid()
