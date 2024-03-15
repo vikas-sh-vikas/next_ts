@@ -13,14 +13,12 @@ export async function POST(request: NextRequest) {
     if (!customer) {
       return NextResponse.json({ error: "Customer not found" }, { status: 400 });
     }
-    // const customer = await Customer.create({  reqBody})
-    // console.log("Customer Reach Add",customer)
 
     return NextResponse.json({
       message: "Data Deleted",
       success: true,
     });
   } catch (error: any) {
-    return NextResponse.json({ erroer: error.message }), { status: 500 };
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -13,7 +13,7 @@ type CustomerModel = {
   contactPerson: string;
   contactDetail: string;
 };
-function index() {
+function Index() {
   const router = useRouter();
   const [data, setData] = useState<CustomerModel[]>([]);
   const [modal, setModal] = useState(false);
@@ -120,7 +120,7 @@ function index() {
         </thead>
         {data?.map((item, idx) => {
           return (
-            <tr className="bg-white dark:bg-gray-800">
+            <tr key={item._id} className="bg-white dark:bg-gray-800">
               <td className="px-6 py-4">{idx + 1}</td>
               <td className="px-6 py-4">{item?.customerName}</td>
               <td className="px-6 py-4">{item?.gstNo}</td>
@@ -262,8 +262,8 @@ function index() {
                 onClick={()=>{deleteConfirmFunction()}}
                 className="py-2 px-3 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-900"
               >
-                Yes, I'm sure
-              </button>s
+                {"Yes, I'm sure"}
+              </button>
             </div>
           </div>
         </div>
@@ -272,4 +272,4 @@ function index() {
   );
 }
 
-export default index;
+export default Index;

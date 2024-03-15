@@ -4,7 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { FaCheck, FaPlus, FaTimes, FaTrash } from "react-icons/fa";
+import { FaPlus, FaTimes, FaTrash } from "react-icons/fa";
 import { Table, Input } from "reactstrap";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -85,7 +85,7 @@ function Form() {
     if (id) {
       getInvoiceDetailByid();
     }
-  }, [id]);
+  }, []);
   const gstOptions = [
     {
       label: "5%",
@@ -170,12 +170,24 @@ function Form() {
       .replace("@date@", formValues?.date)
       .replace("@shipTo@", formValues?.shipTo?.label)
       .replace("@billTo@", formValues?.billTo?.label)
-      .replace("@labourCharge@", parseInt(formValues?.labourCharge) + parseInt(formValues?.freight) )
+      .replace(
+        "@labourCharge@",
+        parseInt(formValues?.labourCharge) + parseInt(formValues?.freight)
+      )
       .replace("@freight@", formValues?.freight)
       .replace("@gstType@", formValues?.gstType?.label)
-      .replace("@igstper@", formValues?.igst?.label ? formValues?.igst?.label : "")
-      .replace("@cgstper@", formValues?.cgst?.label ? formValues?.cgst?.label : "")
-      .replace("@sgstper@", formValues?.sgst?.label ? formValues?.sgst?.label : "")
+      .replace(
+        "@igstper@",
+        formValues?.igst?.label ? formValues?.igst?.label : ""
+      )
+      .replace(
+        "@cgstper@",
+        formValues?.cgst?.label ? formValues?.cgst?.label : ""
+      )
+      .replace(
+        "@sgstper@",
+        formValues?.sgst?.label ? formValues?.sgst?.label : ""
+      )
       .replace("@total@", formValues?.totalAmount)
       .replace("@totalGst@", formValues?.totalAmountGst);
     // console.log(html);
@@ -194,7 +206,12 @@ function Form() {
       jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
     };
     console.log("html", html);
-    html2pdf().set(opt).from(html).toPdf().get("pdf").output("dataurlnewwindow");
+    html2pdf()
+      .set(opt)
+      .from(html)
+      .toPdf()
+      .get("pdf")
+      .output("dataurlnewwindow");
   };
   const getCustomerdetails = async () => {
     try {
@@ -268,12 +285,7 @@ function Form() {
           data
         );
         const apiData: any = response.data.data;
-        // console.log("DataMaterial", apiData);
         setValue("itemList", apiData);
-        // reset({
-        //   ...formValues, // keep existing form data
-        //   itemList: apiData, // update itemList with new data
-        // });
       } catch (error: any) {
         console.log(error);
       }

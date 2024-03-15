@@ -28,7 +28,7 @@ type itemModal = {
   hsnCode: string;
   price: string;
 };
-function index(searchParams: any) {
+function Index(searchParams: any) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const showModal = () => {
@@ -292,7 +292,7 @@ function index(searchParams: any) {
           )
           .map((item, idx) => {
             return (
-              <tr className="bg-white dark:bg-gray-800">
+              <tr key={item._id} className="bg-white dark:bg-gray-800">
                 <td className="px-6 py-4">
                   {idx + 1 + (currentPage - 1) * pageSize}
                 </td>
@@ -429,7 +429,7 @@ function index(searchParams: any) {
                 }}
                 className="py-2 px-3 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-900"
               >
-                Yes, I'm sure
+                {"Yes, I'm sure"}
               </button>
             </div>
           </div>
@@ -439,4 +439,4 @@ function index(searchParams: any) {
   );
 }
 
-export default index;
+export default Index;
