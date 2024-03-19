@@ -35,28 +35,8 @@ export default function Profile() {
               >
                 <FaFileInvoice className="text-gray-500 transition duration-7 group-hover:text-gray-900 dark:group-hover:text-white"></FaFileInvoice>{" "}
                 <span className="flex-1 ms-3 whitespace-nowrap">Invoice</span>
-                {/* <span className="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
-                  3
-                </span> */}
               </Link>
             </li>
-            {/* <li>
-              <Link
-                href="#"
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-              >
-                <svg
-                  className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 20 18"
-                >
-                  <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z" />
-                </svg>
-                <span className="flex-1 ms-3 whitespace-nowrap">Users</span>
-              </Link>
-            </li> */}
             <li>
               <Link
                 href="/dashboard/products"
@@ -112,24 +92,27 @@ export default function Profile() {
         </div>
       </aside>
       <div className="lg:col-span-10 sm:col-span-12 col-span-12 m-4 grid sm:grid-cols-2 gap-4">
-        <div className="bg-indigo-100 hover:bg-indigo-200 rounded-lg shadow flex justify-center items-center flex-col">
+      <Link href={"/dashboard/party"} className=" bg-indigo-100 hover:bg-indigo-200 rounded-lg shadow flex justify-center items-center flex-col">
           <FaUser className="text-5xl text-gray-600"></FaUser>
           <label className="text-4xl uppercase text-gray-600 my-3 font-bold">
-            Customer
+            Party/Ledger
           </label>
-        </div>
-        <div className=" bg-indigo-100 hover:bg-indigo-200 rounded-lg shadow flex justify-center items-center flex-col">
+        </Link>
+        <Link href={"/dashboard/products"} className=" bg-indigo-100 hover:bg-indigo-200 rounded-lg shadow flex justify-center items-center flex-col">
           <FaBox className="text-5xl text-gray-600"></FaBox>
           <label className="text-4xl uppercase text-gray-600 my-3 font-bold">
-            Supplier
+            products
           </label>
-        </div>
-        <div className="bg-indigo-100 hover:bg-indigo-200 rounded-lg shadow flex justify-center items-center flex-col">
-          <FaFileInvoice className="text-5xl text-gray-600"></FaFileInvoice>
-          <label className="text-4xl uppercase text-gray-600 my-3 font-bold">
-            Invoice
-          </label>
-        </div>
+        </Link>
+        <Link
+          href={"/dashboard/invoice"}
+          className="bg-indigo-100 hover:bg-indigo-200 rounded-lg shadow flex justify-center items-center flex-col"
+        >
+            <FaFileInvoice className="text-5xl text-gray-600"></FaFileInvoice>
+            <label className="text-4xl uppercase text-gray-600 my-3 font-bold">
+              Invoice
+            </label>
+        </Link>
         <div className="bg-indigo-100 rounded-lg hover:bg-indigo-200 shadow flex justify-center items-center flex-col">
           <FaUser className="text-5xl text-gray-600"></FaUser>
           <label className="text-4xl uppercase text-gray-600 my-3 font-bold">
